@@ -1,0 +1,3 @@
+h1. External Dependencies
+
+The git repositories for Mobius-JS' external dependencies are cloned in this directory. At any time you can 'git pull' in a given library to get a newer version.
