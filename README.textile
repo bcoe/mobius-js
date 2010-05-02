@@ -1,0 +1,21 @@
+h1. Mobius-JS
+
+Mobius-JS is an MIT-Licensed JavaScript web-framework built on top of Visionmedia's Express.
+
+h2. Installation
+
+bq. ./build.sh
+
+This will clone and build Node.js, along with other dependent libraries.
+
+bq. node scripts/generate.js controller example
+
+Creates an example controller and view.
+
+bq. node scripts/server.js
+
+Run an instance of the server.
+
+bq. http://localhost:8080/example
+
+View the example page.
