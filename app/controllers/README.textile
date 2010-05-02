@@ -1,0 +1,5 @@
+h1. Controllers
+
+The controllers for your application will be auto-generated in this directory. To create a new controller do the following within the mobius-js root directory.
+
+bq. node scripts/generate controller controller_name
