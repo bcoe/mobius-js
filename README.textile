@@ -6,15 +6,21 @@ h2. Installation
 
 bq. ./build.sh
 
-This will clone and build Node.js, along with other dependent libraries.
-
 _*Note* the current bleeding edge version of Node.js has been having trouble on some systems. To get around this, you can install it from a tarball_
+
 bq. wget http://nodejs.org/dist/node-v0.1.93.tar.gz
+
 bq. tar -xvf node-v0.1.93.tar.gz
+
 bq. cd node-v0.1.9
+
 bq. ./configure
+
 bq. make
+
 bq. install
+
+At this point you should have a working copy of Mobius-JS and its dependent libraries.
 
 bq. node scripts/generate.js controller example
 
