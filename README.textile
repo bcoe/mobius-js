@@ -12,7 +12,7 @@ bq. wget http://nodejs.org/dist/node-v0.1.93.tar.gz
 
 bq. tar -xvf node-v0.1.93.tar.gz
 
-bq. cd node-v0.1.9
+bq. cd node-v0.1.93
 
 bq. ./configure
 

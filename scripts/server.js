@@ -41,8 +41,11 @@ controllers = {};
 fs.readdir("app/controllers/", function (err, files) {
 	if (err) throw err;
 	for (var key in files) {
+		
 		controllerFile = files[key].split('.')[0];
-		controllers[controllerFile.toLowerCase()] = (require(controllerFile))[helpers.stringToClassName(controllerFile, '-')];
+		if (files[key].split('.')[1] == 'js') {
+			controllers[controllerFile.toLowerCase()] = (require(controllerFile))[helpers.stringToClassName(controllerFile, '-')];
+		}
 	}
 });
 

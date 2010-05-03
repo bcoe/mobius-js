@@ -3,4 +3,5 @@ h1. External Dependencies
 The git repositories for Mobius-JS' external dependencies are cloned in this directory. At any time you can update a dependent library by doing the following:
 
 bq. cd 'library directory'
+
 bq. git pull
