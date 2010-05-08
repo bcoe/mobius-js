@@ -1,1 +1,16 @@
-{}
+[
+	
+	{
+		"route" : "",
+		"method" : "get",
+		"controller" : "benjamin-coe",
+		"action" : "index"
+	},
+	
+	{
+		"route" : "/charlene",
+		"method" : "get",
+		"controller" : "hello-charlene",
+		"action" : "awesome"
+	}
+]

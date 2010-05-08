@@ -16,67 +16,49 @@
  *
  * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
  *
- * Description: A simple server for the mobius-js framework.
+ * Description: This script bootstraps mobius: loading routes, models,
+ * 				controllers, etc.
  */
 
 // Dependencies .
 require.paths.unshift('./lib');
-require.paths.unshift('./lib');
-require.paths.unshift('./app/controllers');
-require.paths.unshift('./lib/mobius-js/renderer');
-require.paths.unshift('./lib/mobius-js/helpers');
-require.paths.unshift('./lib/resig');
 
 var sys = require('sys');
-var resig = require('resig');
+var resig = require('resig/resig');
+var helpers = require('mobius-js/helpers/helpers');
+var stack = require('mobius-js/processing-stack');
+var bootstrap = require('mobius-js/bootstrap')
+
 require('express');
 require('mobius-js/controller');
-var helpers = require('helpers');
-//
+require('mobius-js/model');
 
-// Load controllers.
-fs = require('fs');
-
-controllers = {};
-fs.readdir("app/controllers/", function (err, files) {
-	if (err) throw err;
-	for (var key in files) {
-		
-		controllerFile = files[key].split('.')[0];
-		if (files[key].split('.')[1] == 'js') {
-			controllers[controllerFile.toLowerCase()] = (require(controllerFile))[helpers.stringToClassName(controllerFile, '-')];
-		}
-	}
-});
-
-
-// Configure express.
+// Configure the Express DSL server.
+var serverConfiguration = helpers.loadConfiguration('server');
 configure(function(){
 	// Set root directory.
 	set('root', __dirname);
 	
 	// Load static routing.
-	use(require('express/plugins/static').Static, {path: './public/'}); // Static routes.
+	use(require('express/plugins/static').Static, {path: './public/'});
 	
 	// Set the views directory.
 	set('views', function(){ return set('root') + '/../app/views' });
 });
-	
-// Default controller/action/id route.	
-get('/:controller/:action(/:id)?', function(controller, action) {
-	controllerInstance = new controllers[controller.toLowerCase()];
-	controllerInstance.execute(controller, action, this);
+run(serverConfiguration.port); // Start the express server.
+
+// The server-side processing stack provides synchronous access to
+// asynchronous actions.
+var dbConfiguration = helpers.loadConfiguration('db');
+var mobiusProcessingStack = new stack.ProcessingStack(dbConfiguration);
+
+// Load models and controllers.
+var controllers = bootstrap.loadControllers(function() {});
+var models = bootstrap.loadModels(function() {
+	bootstrap.createIndexes(models, mobiusProcessingStack);
+	bootstrap.initializeControllers(controllers, models, mobiusProcessingStack);	
 });
 
-// Default controller/action/id route.	
-get('/:controller(/)?', function(controller, action) {
-	controllerInstance = new controllers[controller.toLowerCase()];
-	controllerInstance.execute(controller, action, this);
-});
-
-post('/:controller/:action(/:id)?', function(controller, action) {
-	controllerInstance = new controllers[controller.toLowerCase()];
-	controllerInstance.execute(controller, action, this);
-});
-
-run(8080);
+// Load in all of the routes described in routes.json.
+var routes = helpers.loadConfiguration('routes');
+bootstrap.initializeRoutes(routes, controllers, mobiusProcessingStack);
