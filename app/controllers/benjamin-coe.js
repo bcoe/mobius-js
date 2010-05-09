@@ -1,11 +1,10 @@
 exports.BenjaminCoe = MobiusController.extend({
 	index: function() {	
 		var self = this;
-		MobiusModel.BlogPost.create({
-			title : 'Testing out the framework I have been building.',
-			body : 'Test blog post body.',
-			date : new Date()
-		});
+		
+		
+		this.params['date'] = new Date();
+		MobiusModel.BlogPost.create(this.params['BlogPost']);
 		
 		MobiusModel.BlogPost.find(
 			{

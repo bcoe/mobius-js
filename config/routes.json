@@ -7,6 +7,13 @@
 	},
 	
 	{
+		"route" : "",
+		"method" : "post",
+		"controller" : "benjamin-coe",
+		"action" : "index"
+	},
+	
+	{
 		"route" : "/blog",
 		"method" : "get",
 		"controller" : "blog",

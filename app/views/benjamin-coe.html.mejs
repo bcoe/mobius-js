@@ -1,5 +1,6 @@
-<h1><%= post.title %></h1>
-Date: <i><%= post.date %></i>
+<h1><%= post ? post.title : '' %></h1>
+Date: <i><%= post ? post.date : '' %></i>
 <p>
-	<%=h( post.body )%>
+	<%=h( post ? post.body : '' )%>
+	<%=form( MobiusModel.BlogPost )%>
 </p>
