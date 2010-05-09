@@ -8,7 +8,7 @@
 <script>
 function asd() {
 	
-		parent.document.title="model.js Overview";
+		parent.document.title="helpers.js Overview";
 	
 }
 </script>
@@ -68,7 +68,7 @@ function asd() {
 <hr>
 <center>
 	
-	   <h2>model.js</h2>
+	   <h2>helpers.js</h2>
 	
 </center>
 
@@ -78,12 +78,29 @@ function asd() {
 <h4>Summary</h4>
 <p>
 	
-		No overview generated for 'model.js'<BR/><BR/>
+		No overview generated for 'helpers.js'<BR/><BR/>
 	
 </p>
 
 <hr>
 
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan=2><font size="+2">
+    
+        <b>Class Summary</b>
+    
+    </font></td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="Helpers.html">Helpers</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+    <hr/> 
 
 
 <!-- ========== METHOD SUMMARY =========== -->
@@ -109,94 +126,76 @@ function asd() {
  *
  * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
  *
- * Description: The mobius model class. Some parameters are set on
- * this class' prototype in bootstrap.js which you should also read.
+ * Description: Various helper functions used by the mobius
+ * framework.
  */</span>
 
 <span class="comment">// Dependencies.</span>
+var fs = require(<span class="literal">'fs'</span>);
 var sys = require(<span class="literal">'sys'</span>);
-var resig = require(<span class="literal">'resig/resig'</span>);
-var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+
+<span class="comment">// This class is created for documentation purposes.</span>
+<span class="reserved">function</span> Helpers() {};
 
 <span class="comment">/**
- * A Mobius model inherits from a Resig class.
- */</span>
-MobiusModel = resig.Class.extend( {
-});
-
-<span class="comment">/**
- * Base class for all models. Provides CRUD functionality. As of right now, 
- * MongoDB provides the persistent storage. Note: Do not access this method
- * directly, instead use MobiusModel.extend({});
+ * Converts a string with hyphens to a camel-case action name.
  *
- * <span class="attrib">@type</span> void
+ * <span class="attrib">@param</span> {string} string the string that should be converted into an action.
+ * <span class="attrib">@param</span> {string} character the character to join on, usually '-'.
+ * <span class="attrib">@type</span> {string}
+ * <span class="attrib">@return</span> a string with a lower-case first letter in camel case.
  * <span class="attrib">@public</span>
  */</span>
-MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack) {
-	<span class="reserved">this</span>.processingStack = processingStack;
-},
-
-<span class="comment">/**
- * Close the database connection.
- * 
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>() {
-	<span class="reserved">this</span>.processingStack.close();
-}
-
-<span class="comment">/**
- * Create a new model.
- *
- * <span class="attrib">@param</span> {object} paramsTemp Key value pairs representing model to create.
- * <span class="attrib">@throws</span> ValidationException if model cannot be validated.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(paramsTemp) {
-	params = {};
-	params[<span class="literal">'values'</span>] = paramsTemp;
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.create(params);
-},
-
-<span class="comment">/**
- * Called automatically in the bootstrapping process, creates indexes for this model.
- *
- * <span class="attrib">@param</span> {object} params A structure representing MongoDB indexes.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(params) {
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.createIndex(params, <span class="reserved">function</span>() {});
-},
-
-<span class="comment">/**
- * Perorm a query on the database and call the closure provided with the results of the query.
- *
- * <span class="attrib">@param</span> {object} query A database query in MongoDB format.
- * <span class="attrib">@param</span> {object} order An order for results in MongoDB format.
- * <span class="attrib">@param</span> {function} callback This is called with an array containing the results of find.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(query, sort, callback) {
-	params = {};
-	params[<span class="literal">'query'</span>] = query;
+Helpers.<span class="reserved">prototype</span>.stringToActionName = <span class="reserved">function</span>(string, character) {
+	var splitString = string.split(character);
+	var returnMe = splitString[0];
 	
-	<span class="comment">// Map the sort hash onto an array.</span>
-	params[<span class="literal">'sort'</span>] = {};
-	params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>] = [];
-	<span class="reserved">for</span> (var key in sort) {
-		var temp = [key, sort[key]];
-		params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>].push(temp);
+	<span class="reserved">for</span> (var i = 1;i &lt; splitString.length;i++) {
+		tempString = splitString[i];
+		tempString = tempString.substring(0,1).toUpperCase() + tempString.substring(1,tempString.length);
+		returnMe += tempString;
 	}
 	
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.find(params, callback);
-}</pre>
+	<span class="reserved">return</span> returnMe;
+}
+exports.stringToActionName = Helpers.<span class="reserved">prototype</span>.stringToActionName;
+
+<span class="comment">/**
+ * Converts a string with hyphens to a string with capitalized
+ * first letters.
+ *
+ * <span class="attrib">@param</span> {string} string the string that should be converted into an action.
+ * <span class="attrib">@param</span> {string} character the character to join on, usually '-'.
+ * <span class="attrib">@type</span> {string}
+ * <span class="attrib">@return</span> a string with an upper-case first letter in camel case.
+ * <span class="attrib">@public</span>
+ */</span>
+Helpers.<span class="reserved">prototype</span>.stringToClassName = <span class="reserved">function</span>(string, character) {
+	var splitString = string.split(character);
+	var returnMe = <span class="literal">""</span>;
+	
+	<span class="reserved">for</span> (var i = 0;i &lt; splitString.length;i++) {
+		tempString = splitString[i];
+		tempString = tempString.substring(0,1).toUpperCase() + tempString.substring(1,tempString.length);
+		returnMe += tempString;
+	}
+	
+	<span class="reserved">return</span> returnMe;	
+}
+exports.stringToClassName = Helpers.<span class="reserved">prototype</span>.stringToClassName;
+
+<span class="comment">/**
+ * Loads in a .json configuration file.
+ *
+ * <span class="attrib">@param</span> {string} name the name of the configuration file to load from config/.
+ * <span class="attrib">@type</span> object the decoded .json configuration file.
+ * <span class="attrib">@public</span>
+ */</span>
+Helpers.<span class="reserved">prototype</span>.loadConfiguration = <span class="reserved">function</span>(name) {
+	jsonData = fs.readFileSync(<span class="literal">'config/'</span> + name + <span class="literal">'.json'</span>);
+	<span class="reserved">return</span> JSON.decode(jsonData);
+}
+exports.loadConfiguration = Helpers.<span class="reserved">prototype</span>.loadConfiguration;</pre>
 	<hr>
 
 

@@ -8,7 +8,7 @@
 <script>
 function asd() {
 	
-		parent.document.title="model.js Overview";
+		parent.document.title="generate.js Overview";
 	
 }
 </script>
@@ -68,7 +68,7 @@ function asd() {
 <hr>
 <center>
 	
-	   <h2>model.js</h2>
+	   <h2>generate.js</h2>
 	
 </center>
 
@@ -78,12 +78,29 @@ function asd() {
 <h4>Summary</h4>
 <p>
 	
-		No overview generated for 'model.js'<BR/><BR/>
+		No overview generated for 'generate.js'<BR/><BR/>
 	
 </p>
 
 <hr>
 
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan=2><font size="+2">
+    
+        <b>Class Summary</b>
+    
+    </font></td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="Generate.html">Generate</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+    <hr/> 
 
 
 <!-- ========== METHOD SUMMARY =========== -->
@@ -109,93 +126,114 @@ function asd() {
  *
  * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
  *
- * Description: The mobius model class. Some parameters are set on
- * this class' prototype in bootstrap.js which you should also read.
+ * Description: This script can be used to generate models, controllers, etc.
  */</span>
 
 <span class="comment">// Dependencies.</span>
+require.paths.unshift(<span class="literal">'./lib'</span>)
+var fs = require(<span class="literal">'fs'</span>);
 var sys = require(<span class="literal">'sys'</span>);
-var resig = require(<span class="literal">'resig/resig'</span>);
 var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+var renderer = require(<span class="literal">'mobius-js/renderer/mejs'</span>);
+
+<span class="comment">// Allow certain actions to generate multiple files.</span>
+var additionalGeneration = {};
+additionalGeneration[<span class="literal">'controller'</span>] = {view : <span class="literal">'.html.mejs'</span>};
+
+<span class="comment">// This class is created for documentation purposes.</span>
+<span class="reserved">function</span> Generate() {};
 
 <span class="comment">/**
- * A Mobius model inherits from a Resig class.
- */</span>
-MobiusModel = resig.Class.extend( {
-});
-
-<span class="comment">/**
- * Base class for all models. Provides CRUD functionality. As of right now, 
- * MongoDB provides the persistent storage. Note: Do not access this method
- * directly, instead use MobiusModel.extend({});
+ * Generate models, controllers, views, etc.
  *
+ * <span class="attrib">@param</span> {string} templateFile file in templates directory to use for generation.
+ * <span class="attrib">@param</span> {string} generatedFile name of file to generate
+ * <span class="attrib">@param</span> {string} className Class-name for class in file generated.
+ * <span class="attrib">@fileType</span> {string} fileType type of file being generated.
+ * <span class="attrib">@fileName</span> {string} fileName file name without extension.
  * <span class="attrib">@type</span> void
  * <span class="attrib">@public</span>
  */</span>
-MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack) {
-	<span class="reserved">this</span>.processingStack = processingStack;
-},
-
-<span class="comment">/**
- * Close the database connection.
- * 
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>() {
-	<span class="reserved">this</span>.processingStack.close();
+Generate.<span class="reserved">prototype</span>.generate = <span class="reserved">function</span>(templateFile, generatedFile, className, fileType, fileName) {
+	try {
+		sys.puts(<span class="literal">'Generating '</span> + fileType + <span class="literal">': '</span> + generatedFile);
+		
+		<span class="comment">// Load and render the template.</span>
+		templateData = fs.readFileSync(templateFile);
+		var options = {
+			locals : {
+				className: className, 
+				generatedFile: generatedFile, 
+				openToken: <span class="literal">'&lt;%='</span>
+			}
+		}
+		var body = renderer.render(templateData, options);
+		
+		<span class="comment">// Output the result of the template.</span>
+		<span class="reserved">if</span> (body) {
+			fs.writeFileSync(generatedFile, body);
+		}
+		
+		<span class="comment">// Generate additional files.</span>
+		<span class="reserved">if</span> (additionalGeneration[fileType]) {
+			<span class="reserved">for</span> (var key in additionalGeneration[fileType]) {
+				var type = key;
+				var extension = additionalGeneration[fileType][<span class="literal">'view'</span>];
+				Generate.<span class="reserved">prototype</span>.parseArguments(type, fileName, extension);
+			}
+		}
+		
+	} catch (e) {
+		sys.puts(e);
+	}
 }
 
 <span class="comment">/**
- * Create a new model.
+ * Parse command line arguments and use them to perform code generation.
  *
- * <span class="attrib">@param</span> {object} paramsTemp Key value pairs representing model to create.
- * <span class="attrib">@throws</span> ValidationException if model cannot be validated.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
+ * <span class="attrib">@param</span> {string} arg2 argument 2 passed in from the command line.
+ * <span class="attrib">@param</span> {string} arg3 argument 3 passed in from the command line.
+ * <span class="attrib">@param</span> {string} extension extension of the file to be generated.
  */</span>
-MobiusModel.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(paramsTemp) {
-	params = {};
-	params[<span class="literal">'values'</span>] = paramsTemp;
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.create(params);
-},
-
-<span class="comment">/**
- * Called automatically in the bootstrapping process, creates indexes for this model.
- *
- * <span class="attrib">@param</span> {object} params A structure representing MongoDB indexes.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(params) {
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.createIndex(params, <span class="reserved">function</span>() {});
-},
-
-<span class="comment">/**
- * Perorm a query on the database and call the closure provided with the results of the query.
- *
- * <span class="attrib">@param</span> {object} query A database query in MongoDB format.
- * <span class="attrib">@param</span> {object} order An order for results in MongoDB format.
- * <span class="attrib">@param</span> {function} callback This is called with an array containing the results of find.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(query, sort, callback) {
-	params = {};
-	params[<span class="literal">'query'</span>] = query;
+Generate.<span class="reserved">prototype</span>.parseArguments = <span class="reserved">function</span>(arg2, arg3, extension) {
+	<span class="comment">// Read command line arguments.</span>
+	var fileType = arg2;
+	var fileName = arg3.replace(<span class="literal">'_'</span>, <span class="literal">'-'</span>);
 	
-	<span class="comment">// Map the sort hash onto an array.</span>
-	params[<span class="literal">'sort'</span>] = {};
-	params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>] = [];
-	<span class="reserved">for</span> (var key in sort) {
-		var temp = [key, sort[key]];
-		params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>].push(temp);
+	<span class="comment">// Create class name based on file name provided.</span>
+	var className = helpers.stringToClassName(fileName, <span class="literal">'-'</span>);
+
+	<span class="comment">// Paths for code generation.</span>
+	var templatePath = <span class="literal">'lib/mobius-js/templates/'</span>;
+	var classPath = <span class="literal">'app/'</span> + fileType + <span class="literal">'s/'</span>;
+	
+	var templateFile = templatePath + fileType + <span class="literal">'.mejs'</span>
+	var classFile = classPath + fileName + (extension ? extension : <span class="literal">'.js'</span>);
+	
+	<span class="comment">// Does this type of code generation file exist?</span>
+	try {
+		fs.lstatSync(templateFile);
+		
+		<span class="comment">// Does a file with this name already exist?</span>
+		try {
+			fs.lstatSync(classFile);
+			sys.puts(<span class="literal">'A '</span> + fileType + <span class="literal">' with this name already exists.'</span>);
+		} catch (e) {
+			<span class="comment">// Actually generate the file.</span>
+			Generate.<span class="reserved">prototype</span>.generate(templateFile, classFile, className, fileType, fileName);
+		}
+		
+	} catch (e) {
+		sys.puts(e);
+		sys.puts(<span class="literal">'Could not find template for generating file of type '</span> + fileType + <span class="literal">'.'</span>);
 	}
-	
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.find(params, callback);
+}
+
+<span class="comment">// Extract command line arguments.</span>
+<span class="reserved">if</span> (!process.argv[2] || !process.argv[3]) {
+	sys.puts(<span class="literal">"Usage: node scripts/generate.js [file_type] [file_name]"</span>);
+} <span class="reserved">else</span> {
+	Generate.<span class="reserved">prototype</span>.parseArguments(process.argv[2], process.argv[3]);
 }</pre>
 	<hr>
 

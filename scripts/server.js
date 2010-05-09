@@ -22,6 +22,7 @@
 
 // Dependencies .
 require.paths.unshift('./lib');
+require.paths.unshift('./lib/mobius-js/renderer');
 
 var sys = require('sys');
 var resig = require('resig/resig');

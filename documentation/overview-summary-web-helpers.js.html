@@ -8,7 +8,7 @@
 <script>
 function asd() {
 	
-		parent.document.title="model.js Overview";
+		parent.document.title="web-helpers.js Overview";
 	
 }
 </script>
@@ -68,7 +68,7 @@ function asd() {
 <hr>
 <center>
 	
-	   <h2>model.js</h2>
+	   <h2>web-helpers.js</h2>
 	
 </center>
 
@@ -78,7 +78,7 @@ function asd() {
 <h4>Summary</h4>
 <p>
 	
-		No overview generated for 'model.js'<BR/><BR/>
+		No overview generated for 'web-helpers.js'<BR/><BR/>
 	
 </p>
 
@@ -109,94 +109,8 @@ function asd() {
  *
  * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
  *
- * Description: The mobius model class. Some parameters are set on
- * this class' prototype in bootstrap.js which you should also read.
- */</span>
-
-<span class="comment">// Dependencies.</span>
-var sys = require(<span class="literal">'sys'</span>);
-var resig = require(<span class="literal">'resig/resig'</span>);
-var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
-
-<span class="comment">/**
- * A Mobius model inherits from a Resig class.
- */</span>
-MobiusModel = resig.Class.extend( {
-});
-
-<span class="comment">/**
- * Base class for all models. Provides CRUD functionality. As of right now, 
- * MongoDB provides the persistent storage. Note: Do not access this method
- * directly, instead use MobiusModel.extend({});
- *
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack) {
-	<span class="reserved">this</span>.processingStack = processingStack;
-},
-
-<span class="comment">/**
- * Close the database connection.
- * 
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>() {
-	<span class="reserved">this</span>.processingStack.close();
-}
-
-<span class="comment">/**
- * Create a new model.
- *
- * <span class="attrib">@param</span> {object} paramsTemp Key value pairs representing model to create.
- * <span class="attrib">@throws</span> ValidationException if model cannot be validated.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(paramsTemp) {
-	params = {};
-	params[<span class="literal">'values'</span>] = paramsTemp;
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.create(params);
-},
-
-<span class="comment">/**
- * Called automatically in the bootstrapping process, creates indexes for this model.
- *
- * <span class="attrib">@param</span> {object} params A structure representing MongoDB indexes.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(params) {
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.createIndex(params, <span class="reserved">function</span>() {});
-},
-
-<span class="comment">/**
- * Perorm a query on the database and call the closure provided with the results of the query.
- *
- * <span class="attrib">@param</span> {object} query A database query in MongoDB format.
- * <span class="attrib">@param</span> {object} order An order for results in MongoDB format.
- * <span class="attrib">@param</span> {function} callback This is called with an array containing the results of find.
- * <span class="attrib">@type</span> void
- * <span class="attrib">@public</span>
- */</span>
-MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(query, sort, callback) {
-	params = {};
-	params[<span class="literal">'query'</span>] = query;
-	
-	<span class="comment">// Map the sort hash onto an array.</span>
-	params[<span class="literal">'sort'</span>] = {};
-	params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>] = [];
-	<span class="reserved">for</span> (var key in sort) {
-		var temp = [key, sort[key]];
-		params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>].push(temp);
-	}
-	
-	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.find(params, callback);
-}</pre>
+ * Description:  Web related helper functions.
+ */</span></pre>
 	<hr>
 
 

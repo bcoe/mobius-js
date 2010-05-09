@@ -198,6 +198,14 @@ process.EventEmitter.<span class="reserved">prototype</span>.emit = <span class=
 <span class="comment">// This class is created for documentation purposes.</span>
 <span class="reserved">function</span> MongoDBConnector() {};
 
+<span class="comment">/**
+ * Connet to the MongoDB database.
+ *
+ * <span class="attrib">@param</span> {object} dbConfiguration database configuration loaded in from db.json
+ * <span class="attrib">@param</span> {function} callback callback function returns control to the processing-stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
 MongoDBConnector.<span class="reserved">prototype</span>.connect = <span class="reserved">function</span>(dbConfiguration, callback) {
 
 	var host = dbConfiguration[<span class="literal">'host'</span>];
@@ -213,12 +221,30 @@ MongoDBConnector.<span class="reserved">prototype</span>.connect = <span class="
 }
 exports.connect = MongoDBConnector.<span class="reserved">prototype</span>.connect;
 
+<span class="comment">/**
+ * Close the MongoDB connection.
+ *
+ * <span class="attrib">@param</span> {object} self reference to synchronous processing stack.
+ * <span class="attrib">@param</span> {object} params unused.
+ * <span class="attrib">@param</span> {function} callback callback for returning control to processing stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
 MongoDBConnector.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>(self, params, callback) {
 	self.db.close();
 	callback();
 }
 exports.close = MongoDBConnector.<span class="reserved">prototype</span>.close;
 
+<span class="comment">/**
+ * Create a new index on a MongoDB document.
+ *
+ * <span class="attrib">@param</span> {object} self reference to synchronous processing stack.
+ * <span class="attrib">@param</span> {object} params object that describes the indexes on a MongoDB document.
+ * <span class="attrib">@param</span> {function} callback callback for returning control to processing stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
 MongoDBConnector.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(self, params, callback) {
 	self.db.collection(params[<span class="literal">'collectionName'</span>], <span class="reserved">function</span>(err, collection) {
 
@@ -231,17 +257,26 @@ MongoDBConnector.<span class="reserved">prototype</span>.createIndex = <span cla
 }
 exports.createIndex = MongoDBConnector.<span class="reserved">prototype</span>.createIndex;
 
+<span class="comment">/**
+ * Create a new MongoDB document.
+ *
+ * <span class="attrib">@param</span> {object} self reference to synchronous processing stack.
+ * <span class="attrib">@param</span> {object} params parameters for creating new model.
+ * <span class="attrib">@param</span> {function} callback callback for returning control to processing stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
 MongoDBConnector.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(self, params, callback) {
 	
 	self.db.collection(params[<span class="literal">'collectionName'</span>], <span class="reserved">function</span>(err, collection) {
 		
 		var results = {};
         <span class="comment">// Insert the model.</span>
-        collection.insert(params[<span class="literal">'values'</span>], <span class="reserved">function</span>(err, docs) {		
-            docs.forEach(<span class="reserved">function</span>(doc) {
+        collection.insert(params[<span class="literal">'values'</span>], <span class="reserved">function</span>(err, docs) {
+           <span class="comment">/* docs.forEach(function(doc) {
               sys.puts(sys.inspect(doc));
               results[doc.name] = doc;
-            });
+            });*/</span>
 			callback();
         });
 		
@@ -249,6 +284,15 @@ MongoDBConnector.<span class="reserved">prototype</span>.create = <span class="r
 }
 exports.create = MongoDBConnector.<span class="reserved">prototype</span>.create;
 
+<span class="comment">/**
+ * Query for a MongoDB document.
+ *
+ * <span class="attrib">@param</span> {object} self reference to synchronous processing stack.
+ * <span class="attrib">@param</span> {object} params parameters for finding the document.
+ * <span class="attrib">@param</span> {function} callback callback for returning control to processing stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
 MongoDBConnector.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(self, params, callback) {
 	
 	<span class="comment">// Used to return results back to a controller.</span>
@@ -260,7 +304,7 @@ MongoDBConnector.<span class="reserved">prototype</span>.find = <span class="res
 		
 		var results = [];
         <span class="comment">// Return the results.</span>
-		collection.find(params[<span class="literal">'query'</span>], {}, <span class="reserved">function</span>(err, cursor) {
+		collection.find(params[<span class="literal">'query'</span>], params[<span class="literal">'sort'</span>], <span class="reserved">function</span>(err, cursor) {
 			cursor.each(<span class="reserved">function</span>(err, article) {
 				<span class="reserved">if</span>(article != null) {
 					results.push(article);
@@ -329,6 +373,6 @@ exports.find = MongoDBConnector.<span class="reserved">prototype</span>.find;</p
 <font size="-1">
 
 </font>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May  8 22:15:11 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
 </body>
 </html>

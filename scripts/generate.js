@@ -20,23 +20,31 @@
  */
 
 // Dependencies.
-require.paths.unshift('./lib/mobius-js/');
+require.paths.unshift('./lib')
 var fs = require('fs');
 var sys = require('sys');
-var helpers = require('helpers/helpers');
-var renderer = require('renderer/ejs');
+var helpers = require('mobius-js/helpers/helpers');
+var renderer = require('mobius-js/renderer/mejs');
 
 // Allow certain actions to generate multiple files.
 var additionalGeneration = {};
-additionalGeneration['controller'] = {view : '.html.ejs'};
+additionalGeneration['controller'] = {view : '.html.mejs'};
+
+// This class is created for documentation purposes.
+function Generate() {};
 
 /**
- * Actually generate the file.
- * @param {string} templateFile
- * @param {string} generatedFile
- * 
+ * Generate models, controllers, views, etc.
+ *
+ * @param {string} templateFile file in templates directory to use for generation.
+ * @param {string} generatedFile name of file to generate
+ * @param {string} className Class-name for class in file generated.
+ * @fileType {string} fileType type of file being generated.
+ * @fileName {string} fileName file name without extension.
+ * @type void
+ * @public
  */
-function generate(templateFile, generatedFile, className, fileType, fileName) {
+Generate.prototype.generate = function(templateFile, generatedFile, className, fileType, fileName) {
 	try {
 		sys.puts('Generating ' + fileType + ': ' + generatedFile);
 		
@@ -61,7 +69,7 @@ function generate(templateFile, generatedFile, className, fileType, fileName) {
 			for (var key in additionalGeneration[fileType]) {
 				var type = key;
 				var extension = additionalGeneration[fileType]['view'];
-				parseArguments(type, fileName, extension);
+				Generate.prototype.parseArguments(type, fileName, extension);
 			}
 		}
 		
@@ -71,9 +79,13 @@ function generate(templateFile, generatedFile, className, fileType, fileName) {
 }
 
 /**
- * Perform generation based on the arguments provided.
+ * Parse command line arguments and use them to perform code generation.
+ *
+ * @param {string} arg2 argument 2 passed in from the command line.
+ * @param {string} arg3 argument 3 passed in from the command line.
+ * @param {string} extension extension of the file to be generated.
  */
-function parseArguments(arg2, arg3, extension) {
+Generate.prototype.parseArguments = function(arg2, arg3, extension) {
 	// Read command line arguments.
 	var fileType = arg2;
 	var fileName = arg3.replace('_', '-');
@@ -85,7 +97,7 @@ function parseArguments(arg2, arg3, extension) {
 	var templatePath = 'lib/mobius-js/templates/';
 	var classPath = 'app/' + fileType + 's/';
 	
-	var templateFile = templatePath + fileType + '.ejs'
+	var templateFile = templatePath + fileType + '.mejs'
 	var classFile = classPath + fileName + (extension ? extension : '.js');
 	
 	// Does this type of code generation file exist?
@@ -98,7 +110,7 @@ function parseArguments(arg2, arg3, extension) {
 			sys.puts('A ' + fileType + ' with this name already exists.');
 		} catch (e) {
 			// Actually generate the file.
-			generate(templateFile, classFile, className, fileType, fileName);
+			Generate.prototype.generate(templateFile, classFile, className, fileType, fileName);
 		}
 		
 	} catch (e) {
@@ -107,9 +119,9 @@ function parseArguments(arg2, arg3, extension) {
 	}
 }
 
-// Process command line arguments.
+// Extract command line arguments.
 if (!process.argv[2] || !process.argv[3]) {
 	sys.puts("Usage: node scripts/generate.js [file_type] [file_name]");
 } else {
-	parseArguments(process.argv[2], process.argv[3]);
+	Generate.prototype.parseArguments(process.argv[2], process.argv[3]);
 }

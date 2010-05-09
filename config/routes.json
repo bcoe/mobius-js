@@ -1,5 +1,4 @@
 [
-	
 	{
 		"route" : "",
 		"method" : "get",
@@ -8,9 +7,9 @@
 	},
 	
 	{
-		"route" : "/charlene",
+		"route" : "/blog",
 		"method" : "get",
-		"controller" : "hello-charlene",
-		"action" : "awesome"
+		"controller" : "blog",
+		"action" : "index"
 	}
 ]

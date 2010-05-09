@@ -151,11 +151,11 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
       <TD>
 	 <CODE>
 	    <B>
-	       <A HREF="#close">close</A></B>(self, params, callback)
+	       <A HREF="#close">close</A></B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)
 	 </CODE>
 	 <BR>
 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 
+	 Close the MongoDB connection.
       </TD>
    </TR>
 
@@ -168,11 +168,11 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
       <TD>
 	 <CODE>
 	    <B>
-	       <A HREF="#connect">connect</A></B>(dbConfiguration, callback)
+	       <A HREF="#connect">connect</A></B>(&lt;object&gt; dbConfiguration, &lt;function&gt; callback)
 	 </CODE>
 	 <BR>
 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 
+	 Connet to the MongoDB database.
       </TD>
    </TR>
 
@@ -185,11 +185,11 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
       <TD>
 	 <CODE>
 	    <B>
-	       <A HREF="#create">create</A></B>(self, params, callback)
+	       <A HREF="#create">create</A></B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)
 	 </CODE>
 	 <BR>
 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 
+	 Create a new MongoDB document.
       </TD>
    </TR>
 
@@ -202,11 +202,11 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
       <TD>
 	 <CODE>
 	    <B>
-	       <A HREF="#createIndex">createIndex</A></B>(self, params, callback)
+	       <A HREF="#createIndex">createIndex</A></B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)
 	 </CODE>
 	 <BR>
 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 
+	 Create a new index on a MongoDB document.
       </TD>
    </TR>
 
@@ -219,11 +219,11 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
       <TD>
 	 <CODE>
 	    <B>
-	       <A HREF="#find">find</A></B>(self, params, callback)
+	       <A HREF="#find">find</A></B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)
 	 </CODE>
 	 <BR>
 	 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-	 
+	 Query for a MongoDB document.
       </TD>
    </TR>
 
@@ -289,10 +289,26 @@ MongoDBConnector</H3>
 
    <A NAME="close"><!-- --></A>
    <H3>close</H3>
-   <PRE>void <B>close</B>(self, params, callback)</PRE>
+   <PRE>void <B>close</B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)</PRE>
+   
+      <UL>Close the MongoDB connection.</UL>
    
 
    <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>self</CODE> -  reference to synchronous processing stack.  
+      </UL> 
+   
+     <UL><CODE>params</CODE> -  unused.  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  callback for returning control to processing stack.  
+      </UL> 
+   
+   </UL>
    
    <!-- METHOD PARAMETERS END -->
 
@@ -305,10 +321,23 @@ MongoDBConnector</H3>
 
    <A NAME="connect"><!-- --></A>
    <H3>connect</H3>
-   <PRE>void <B>connect</B>(dbConfiguration, callback)</PRE>
+   <PRE>void <B>connect</B>(&lt;object&gt; dbConfiguration, &lt;function&gt; callback)</PRE>
+   
+      <UL>Connet to the MongoDB database.</UL>
    
 
    <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>dbConfiguration</CODE> -  database configuration loaded in from db.json  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  callback function returns control to the processing-stack.  
+      </UL> 
+   
+   </UL>
    
    <!-- METHOD PARAMETERS END -->
 
@@ -321,10 +350,26 @@ MongoDBConnector</H3>
 
    <A NAME="create"><!-- --></A>
    <H3>create</H3>
-   <PRE>void <B>create</B>(self, params, callback)</PRE>
+   <PRE>void <B>create</B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)</PRE>
+   
+      <UL>Create a new MongoDB document.</UL>
    
 
    <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>self</CODE> -  reference to synchronous processing stack.  
+      </UL> 
+   
+     <UL><CODE>params</CODE> -  parameters for creating new model.  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  callback for returning control to processing stack.  
+      </UL> 
+   
+   </UL>
    
    <!-- METHOD PARAMETERS END -->
 
@@ -337,10 +382,26 @@ MongoDBConnector</H3>
 
    <A NAME="createIndex"><!-- --></A>
    <H3>createIndex</H3>
-   <PRE>void <B>createIndex</B>(self, params, callback)</PRE>
+   <PRE>void <B>createIndex</B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)</PRE>
+   
+      <UL>Create a new index on a MongoDB document.</UL>
    
 
    <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>self</CODE> -  reference to synchronous processing stack.  
+      </UL> 
+   
+     <UL><CODE>params</CODE> -  object that describes the indexes on a MongoDB document.  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  callback for returning control to processing stack.  
+      </UL> 
+   
+   </UL>
    
    <!-- METHOD PARAMETERS END -->
 
@@ -353,10 +414,26 @@ MongoDBConnector</H3>
 
    <A NAME="find"><!-- --></A>
    <H3>find</H3>
-   <PRE>void <B>find</B>(self, params, callback)</PRE>
+   <PRE>void <B>find</B>(&lt;object&gt; self, &lt;object&gt; params, &lt;function&gt; callback)</PRE>
+   
+      <UL>Query for a MongoDB document.</UL>
    
 
    <!-- METHOD PARAMETERS START -->
+   
+   <UL>
+   <B>Parameters:</B>
+   
+     <UL><CODE>self</CODE> -  reference to synchronous processing stack.  
+      </UL> 
+   
+     <UL><CODE>params</CODE> -  parameters for finding the document.  
+      </UL> 
+   
+     <UL><CODE>callback</CODE> -  callback for returning control to processing stack.  
+      </UL> 
+   
+   </UL>
    
    <!-- METHOD PARAMETERS END -->
 
@@ -433,6 +510,6 @@ DETAIL:&nbsp;<A HREF="#field_detail">FIELD</A>&nbsp;|&nbsp;<A HREF="#constructor
 <FONT SIZE="-1">
 
 </FONT>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May  8 22:15:11 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
 </BODY>
 </HTML>
