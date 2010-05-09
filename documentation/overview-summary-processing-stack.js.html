@@ -1,0 +1,318 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="processing-stack.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();">
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> 	<font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top">
+<em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<center>
+	
+	   <h2>processing-stack.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		No overview generated for 'processing-stack.js'<BR/><BR/>
+	
+</p>
+
+<hr>
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * Mobius-JS
+ *                   /\   \ 
+ *                  /  \   \          
+ *                 /    \   \
+ *                /      \   \
+ *               /   /\   \   \
+ *              /   /  \   \   \
+ *             /   /    \   \   \
+ *            /   /    / \   \   \
+ *           /   /    /   \   \   \
+ *          /   /    /---------'   \
+ *         /   /    /_______________\
+ *         \  /                     /
+ *          \/_____________________/                   
+ *
+ * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
+ *
+ * Description: This class uses a stack to abstract heavily 
+ * nested asynchronous programming away from a user of the framework.
+ */</span>
+
+<span class="comment">// Dependencies.</span>
+var resig = require(<span class="literal">'resig/resig'</span>);
+var sys = require(<span class="literal">'sys'</span>);
+var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+var mongodb = require(<span class="literal">'mobius-js/db/mongodb'</span>)
+
+<span class="comment">/**
+ * A Mobius processing-stack inherits from a Resig class.
+ */</span>
+var ProcessingStack = resig.Class.extend( {
+	processingStack: []
+});
+
+<span class="comment">/**
+ * Synchronous processing stack abstracts away asynchronous behavior.
+ * Note: Do not access this method directly, instead use ProcessingStack.extend({});
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(dbConfiguration) {
+	var self = <span class="reserved">this</span>; <span class="comment">// Store reference to 'this' for closures.</span>
+
+	self.dbConfiguration = dbConfiguration;
+	
+	setTimeout(<span class="reserved">function</span>() {
+		self._processStack(self);
+	}, 10);
+	
+	<span class="comment">// Connect to mongodb.</span>
+	<span class="reserved">this</span>.connect();
+},
+
+<span class="comment">/**
+ * Called by a model to place a create operation on the stack.
+ *
+ * <span class="attrib">@param</span> {object} params key value pairs for creating a new model.
+ * <span class="attrib">@param</span> {function} callback function to execute upon this operations completion.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(params, callback) {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		mongodb.create(self, params, callback);
+	}, params, callback]);
+},
+
+<span class="comment">/**
+ * Called by a model to place an operation on the stack which initializes model indexes.
+ *
+ * <span class="attrib">@param</span> {object} params key value pairs for model index creation operation.
+ * <span class="attrib">@param</span> {function} callback function to execute upon this operations completion.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(params, callback) {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		mongodb.createIndex(self, params, callback);
+	}, params, callback]);
+},
+
+<span class="comment">/**
+ * Called by a model to place a connect operation on the stack.
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.connect = <span class="reserved">function</span>() {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		mongodb.connect(self.dbConfiguration, <span class="reserved">function</span>(db) {
+			self.db = db;
+			callback();
+		});
+	}, {}, <span class="reserved">function</span>(){}]);
+},
+
+
+<span class="comment">/**
+ * Called by a model to place a close operation on the stack.
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>() {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		mongodb.close(self, params, callback);
+	}, {}, <span class="reserved">function</span>(){}])
+},
+
+<span class="comment">/**
+ * A stack operation that returns models from the database as a parameter
+ * to the callback provided.
+ *
+ * <span class="attrib">@param</span> {object} Parameters for restricting and sorting the models returned from the DB.
+ * <span class="attrib">@param</span> {function} callback function to return all models retrieved to. 
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(params, callback) {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		mongodb.find(self, params, callback);
+	}, params, callback])
+},
+
+<span class="comment">/**
+ * Called by a MobiusController to queue up the rendering of a view,
+ * so that it is performed after all other database operations.
+ *
+ * <span class="attrib">@param</span> {object} parameters needed by Express' render function.
+ * <span class="attrib">@param</span> {function} callback the function that actually performs rendering.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>.render = <span class="reserved">function</span>(params, callback) {
+	<span class="reserved">this</span>.processingStack.push([<span class="reserved">function</span>(self, params, callback) {
+		callback(params);
+	}, params, callback])
+},
+
+<span class="comment">/**
+ * Consumes from the processingStack and performs asynchronous operations
+ * in a synchronous fashion.
+ *
+ * <span class="attrib">@param</span> {object} self a reference to the processing stack.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@private</span>
+ */</span>
+ProcessingStack.<span class="reserved">prototype</span>._processStack = <span class="reserved">function</span>(self) {	
+	var callMe = self.processingStack.shift();
+	<span class="reserved">if</span> (callMe) {
+		callMe[0](self, callMe[1], <span class="reserved">function</span>(data) {
+			callMe[2](data);
+			setTimeout(<span class="reserved">function</span>() {
+				self._processStack(self);
+			}, 10);
+		}); <span class="comment">// Call the action of this controller.</span>
+	} <span class="reserved">else</span> {
+		setTimeout(<span class="reserved">function</span>() {
+			self._processStack(self);
+		}, 10);
+	}
+}
+exports.ProcessingStack = ProcessingStack;</pre>
+	<hr>
+
+
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> <font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top"><em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May  8 22:15:11 2010</div>
+</body>
+</html>

@@ -1,0 +1,334 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="mongodb.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();">
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> 	<font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top">
+<em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<center>
+	
+	   <h2>mongodb.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		No overview generated for 'mongodb.js'<BR/><BR/>
+	
+</p>
+
+<hr>
+
+
+    <table border="1" cellpadding="3" cellspacing="0" width="100%">
+    <tr bgcolor="#CCCCFF" class="TableHeadingColor">
+    <td colspan=2><font size="+2">
+    
+        <b>Class Summary</b>
+    
+    </font></td>
+    </tr>
+    
+    <tr bgcolor="white" class="TableRowColor">
+    <td width="15%"><b><a href="MongoDBConnector.html">MongoDBConnector</a></b></td>
+    <td>&nbsp;</td>
+    </tr>
+    
+    </table>
+    <hr/> 
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * Mobius-JS
+ *                   /\   \ 
+ *                  /  \   \          
+ *                 /    \   \
+ *                /      \   \
+ *               /   /\   \   \
+ *              /   /  \   \   \
+ *             /   /    \   \   \
+ *            /   /    / \   \   \
+ *           /   /    /   \   \   \
+ *          /   /    /---------'   \
+ *         /   /    /_______________\
+ *         \  /                     /
+ *          \/_____________________/                   
+ *
+ * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
+ *
+ * Description: A MongoDB database connector for Mobius-JS.
+ */</span>
+
+<span class="comment">// Dependencies.</span>
+var sys = require(<span class="literal">'sys'</span>);
+var mongo = require(<span class="literal">'mongodb'</span>);
+
+<span class="comment">/**
+ * This patch addresses a problem caused by an incompatibility 
+ * between the current version of the mongodb native driver and Node.js.
+ * For some reason the error return value is populated when it shouldn't be.
+ *
+ * <span class="attrib">@param</span> {object} type
+ * <span class="attrib">@type</span> bool
+ * <span class="attrib">@public</span>
+ */</span>
+process.EventEmitter.<span class="reserved">prototype</span>.emit = <span class="reserved">function</span> (type) {
+
+  <span class="comment">// If there is no 'error' event listener then throw.</span>
+  <span class="reserved">if</span> (type === <span class="literal">'error'</span>) {
+    <span class="reserved">if</span> (!<span class="reserved">this</span>._events || !<span class="reserved">this</span>._events.error ||
+        (<span class="reserved">this</span>._events.error instanceof Array &amp;&amp; !<span class="reserved">this</span>._events.error.length))
+    {
+      <span class="reserved">if</span> (arguments[1] instanceof Error) {
+        throw arguments[1];
+      } <span class="reserved">else</span> {
+        throw new Error(<span class="literal">"Uncaught, unspecfied 'error' event."</span>);
+      }
+      <span class="reserved">return</span> false;
+    }
+  }
+
+  <span class="reserved">if</span> (!<span class="reserved">this</span>._events) <span class="reserved">return</span> false;
+  <span class="reserved">if</span> (!<span class="reserved">this</span>._events[type]) <span class="reserved">return</span> false;
+
+  <span class="reserved">if</span> (typeof <span class="reserved">this</span>._events[type] == <span class="literal">'function'</span>) {
+    <span class="reserved">if</span> (arguments.length &lt; 3) {
+      <span class="comment">// fast case</span>
+      <span class="reserved">this</span>._events[type].call( <span class="reserved">this</span>
+                             , arguments[1]
+                             , arguments[2]
+                             );
+    } <span class="reserved">else</span> {
+      <span class="comment">// slower</span>
+      var args = Array.<span class="reserved">prototype</span>.slice.call(arguments, 1);
+	  <span class="comment">// My ugly monkey patch.</span>
+	  <span class="reserved">if</span> (args[0][<span class="literal">'ok'</span>]) {
+		args[0] = null; <span class="comment">// My monkey patch.</span>
+	  }
+      <span class="reserved">this</span>._events[type].apply(<span class="reserved">this</span>, args);
+    }
+    <span class="reserved">return</span> true;
+
+  } <span class="reserved">else</span> <span class="reserved">if</span> (<span class="reserved">this</span>._events[type] instanceof Array) {
+    var args = Array.<span class="reserved">prototype</span>.slice.call(arguments, 1);
+
+
+    var listeners = <span class="reserved">this</span>._events[type].slice(0);
+    <span class="reserved">for</span> (var i = 0, l = listeners.length; i &lt; l; i++) {
+      listeners[i].apply(<span class="reserved">this</span>, args);
+    }
+    <span class="reserved">return</span> true;
+
+  } <span class="reserved">else</span> {
+    <span class="reserved">return</span> false;
+  }
+};
+<span class="comment">// End of crazy monkey patch that should be removed A.S.A.P.</span>
+
+<span class="comment">// This class is created for documentation purposes.</span>
+<span class="reserved">function</span> MongoDBConnector() {};
+
+MongoDBConnector.<span class="reserved">prototype</span>.connect = <span class="reserved">function</span>(dbConfiguration, callback) {
+
+	var host = dbConfiguration[<span class="literal">'host'</span>];
+	var port = dbConfiguration[<span class="literal">'port'</span>];
+
+	sys.puts(<span class="literal">"Connecting to "</span> + host + <span class="literal">":"</span> + port);
+	var db = new mongo.Db(dbConfiguration[<span class="literal">'database'</span>], new mongo.Server(host, port, {<span class="literal">'autoReconnect'</span> : true}), {});
+	
+	db.open(<span class="reserved">function</span>(err, db) {
+		callback(db);
+	});
+	
+}
+exports.connect = MongoDBConnector.<span class="reserved">prototype</span>.connect;
+
+MongoDBConnector.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>(self, params, callback) {
+	self.db.close();
+	callback();
+}
+exports.close = MongoDBConnector.<span class="reserved">prototype</span>.close;
+
+MongoDBConnector.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(self, params, callback) {
+	self.db.collection(params[<span class="literal">'collectionName'</span>], <span class="reserved">function</span>(err, collection) {
+
+		collection.createIndex(params[<span class="literal">'indexes'</span>], <span class="reserved">function</span>(err, indexName) {
+			sys.puts(indexName);
+			callback();
+		});
+		
+	});
+}
+exports.createIndex = MongoDBConnector.<span class="reserved">prototype</span>.createIndex;
+
+MongoDBConnector.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(self, params, callback) {
+	
+	self.db.collection(params[<span class="literal">'collectionName'</span>], <span class="reserved">function</span>(err, collection) {
+		
+		var results = {};
+        <span class="comment">// Insert the model.</span>
+        collection.insert(params[<span class="literal">'values'</span>], <span class="reserved">function</span>(err, docs) {		
+            docs.forEach(<span class="reserved">function</span>(doc) {
+              sys.puts(sys.inspect(doc));
+              results[doc.name] = doc;
+            });
+			callback();
+        });
+		
+	});
+}
+exports.create = MongoDBConnector.<span class="reserved">prototype</span>.create;
+
+MongoDBConnector.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(self, params, callback) {
+	
+	<span class="comment">// Used to return results back to a controller.</span>
+	var callbackTemp = <span class="reserved">function</span>(results) {
+		callback(results)
+	}
+	
+	self.db.collection(params[<span class="literal">'collectionName'</span>], <span class="reserved">function</span>(err, collection) {
+		
+		var results = [];
+        <span class="comment">// Return the results.</span>
+		collection.find(params[<span class="literal">'query'</span>], {}, <span class="reserved">function</span>(err, cursor) {
+			cursor.each(<span class="reserved">function</span>(err, article) {
+				<span class="reserved">if</span>(article != null) {
+					results.push(article);
+				} <span class="reserved">else</span> {
+					callbackTemp(results);
+				}
+			});
+		});
+	});
+}
+exports.find = MongoDBConnector.<span class="reserved">prototype</span>.find;</pre>
+	<hr>
+
+
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> <font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top"><em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May  8 22:15:11 2010</div>
+</body>
+</html>

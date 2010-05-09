@@ -1,0 +1,251 @@
+<!doctype html public "-//W3C//DTD HTML 4.0 Frameset//EN""http://www.w3.org/TR/REC-html40/frameset.dtd">
+<html>
+<head>
+<title>
+ Overview
+</title>
+<link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
+<script>
+function asd() {
+	
+		parent.document.title="model.js Overview";
+	
+}
+</script>
+</head>
+<body bgcolor="white" onload="asd();">
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> 	<font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top">
+<em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<center>
+	
+	   <h2>model.js</h2>
+	
+</center>
+
+	
+
+
+<h4>Summary</h4>
+<p>
+	
+		No overview generated for 'model.js'<BR/><BR/>
+	
+</p>
+
+<hr>
+
+
+
+<!-- ========== METHOD SUMMARY =========== -->
+
+<!-- ========== END METHOD SUMMARY =========== -->
+
+
+        <pre class="sourceview"><span class="comment">/**
+ * Mobius-JS
+ *                   /\   \ 
+ *                  /  \   \          
+ *                 /    \   \
+ *                /      \   \
+ *               /   /\   \   \
+ *              /   /  \   \   \
+ *             /   /    \   \   \
+ *            /   /    / \   \   \
+ *           /   /    /   \   \   \
+ *          /   /    /---------'   \
+ *         /   /    /_______________\
+ *         \  /                     /
+ *          \/_____________________/                   
+ *
+ * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
+ *
+ * Description: The mobius model class. Some parameters are set on
+ * this class' prototype in bootstrap.js which you should also read.
+ */</span>
+
+<span class="comment">// Dependencies.</span>
+var sys = require(<span class="literal">'sys'</span>);
+var resig = require(<span class="literal">'resig/resig'</span>);
+var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+
+<span class="comment">/**
+ * A Mobius model inherits from a Resig class.
+ */</span>
+MobiusModel = resig.Class.extend( {
+});
+
+<span class="comment">/**
+ * Base class for all models. Provides CRUD functionality. As of right now, 
+ * MongoDB provides the persistent storage. Note: Do not access this method
+ * directly, instead use MobiusModel.extend({});
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack) {
+	<span class="reserved">this</span>.processingStack = processingStack;
+},
+
+<span class="comment">/**
+ * Close the database connection.
+ * 
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.close = <span class="reserved">function</span>() {
+	<span class="reserved">this</span>.processingStack.close();
+}
+
+<span class="comment">/**
+ * Create a new model.
+ *
+ * <span class="attrib">@param</span> {object} paramsTemp Key value pairs representing model to create.
+ * <span class="attrib">@throws</span> ValidationException if model cannot be validated.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(paramsTemp) {
+	params = {};
+	params[<span class="literal">'values'</span>] = paramsTemp;
+	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
+	<span class="reserved">this</span>.processingStack.create(params);
+},
+
+<span class="comment">/**
+ * Called automatically in the bootstrapping process, creates indexes for this model.
+ *
+ * <span class="attrib">@param</span> {object} params A structure representing MongoDB indexes.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.createIndex = <span class="reserved">function</span>(params) {
+	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
+	<span class="reserved">this</span>.processingStack.createIndex(params, <span class="reserved">function</span>() {});
+},
+
+<span class="comment">/**
+ * Perorm a query on the database and call the closure provided with the results of the query.
+ *
+ * <span class="attrib">@param</span> {object} query A database query in MongoDB format.
+ * <span class="attrib">@param</span> {object} order An order for results in MongoDB format.
+ * <span class="attrib">@param</span> {function} callback This is called with an array containing the results of find.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(query, order, callback) {
+	params = {};
+	params[<span class="literal">'query'</span>] = query;
+	params[<span class="literal">'order'</span>] = order;
+	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
+	<span class="reserved">this</span>.processingStack.find(params, callback);
+}</pre>
+	<hr>
+
+
+
+<!-- ========== START OF NAVBAR ========== -->
+<a name="navbar_top"><!-- --></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0">
+<tr>
+<td colspan=2 bgcolor="#EEEEFF" class="NavBarCell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3">
+  <tr align="center" valign="top">
+  
+  
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-summary.html"><font class="NavBarFont1"><b>Overview</b></font></a>&nbsp;</td>
+  <td bgcolor="#FFFFFF" class="NavBarCell1Rev">	&nbsp;<font class="NavBarFont1Rev"><b>File</b></font>&nbsp;</td>
+  
+
+  <td bgcolor="#FFFFFF" class="NavBarCell1"> <font class="NavBarFont1">Class</font>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="overview-tree.html"><font class="NavBarFont1"><b>Tree</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="index-all.html"--><font class="NavBarFont1"><b>Index</b></font></a>&nbsp;</td>
+  <td bgcolor="#EEEEFF" class="NavBarCell1">    <a href="help-doc.html"><font class="NavBarFont1"><b>Help</b></font></a>&nbsp;</td>
+  </tr>
+</table>
+</td>
+<td bgcolor="#EEEEFF" align="right" valign="top"><em>
+<b></b></em>
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+&nbsp;PREV&nbsp;
+&nbsp;NEXT</font></td>
+<td bgcolor="white" class="NavBarCell2"><font size="-2">
+  <a href="index.html" target="_top"><b>FRAMES</b></a>  &nbsp;
+&nbsp;<a href="overview-summary.html" target="_top"><b>NO FRAMES</b></a>
+&nbsp;&nbsp;
+<script>
+  <!--
+  if(window==top) {
+    document.writeln('<A HREF="allclasses-noframe.html" TARGET=""><B>All Classes</B></A>');
+  }
+  //-->
+</script>
+<noscript>
+<a href="allclasses-noframe.html" target=""><b>All Classes</b></a>
+</noscript>
+</font></td>
+</tr>
+</table>
+<!-- =========== END OF NAVBAR =========== -->
+
+<hr>
+<font size="-1">
+
+</font>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May  8 22:15:11 2010</div>
+</body>
+</html>
