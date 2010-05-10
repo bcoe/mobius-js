@@ -2,7 +2,10 @@ exports.BlogPost = MobiusModel.extend({});
 
 exports.BlogPost.date = {
 	index: true,
-	type: 'date'
+	type: 'date',
+	validators: {
+		date : {}
+	}
 };
 
 exports.BlogPost.title = {
@@ -22,4 +25,7 @@ exports.BlogPost.body = {
 
 exports.BlogPost.future = {
 	type: 'date',
+	validators: {
+		date : {}
+	}
 };

@@ -2,5 +2,6 @@
 Date: <i><%= post ? post.date : '' %></i>
 <p>
 	<%=h( post ? post.body : '' )%>
-	<%=form( MobiusModel.BlogPost )%>
 </p>
+<hr />
+	<%=form( MobiusModel.BlogPost )%>
