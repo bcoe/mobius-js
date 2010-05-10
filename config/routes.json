@@ -18,5 +18,26 @@
 		"method" : "get",
 		"controller" : "blog",
 		"action" : "index"
+	},
+	
+	{
+		"route" : "/models/:file",
+		"method" : "get",
+		"type" : "static",
+		"path" : "app/models/"
+	},
+	
+	{
+		"route" : "/validators/:file",
+		"method" : "get",
+		"type" : "static",
+		"path" : "lib/mobius-js/validators/"
+	},
+	
+	{
+		"route" : "/lib/model.js",
+		"method" : "get",
+		"type" : "static",
+		"path" : "lib/mobius-js/model.js"
 	}
 ]

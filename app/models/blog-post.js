@@ -19,3 +19,7 @@ exports.BlogPost.body = {
 		size : {min: 3, max: 100, msg : "hot damn! :field"}
 	}
 };
+
+exports.BlogPost.future = {
+	type: 'date',
+};
