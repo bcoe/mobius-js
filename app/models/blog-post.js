@@ -5,7 +5,8 @@ exports.BlogPost.date = {
 	type: 'date',
 	validators: {
 		date : {}
-	}
+	},
+	label: "Publication Date"
 };
 
 exports.BlogPost.title = {
@@ -13,7 +14,8 @@ exports.BlogPost.title = {
 	type: 'text',
 	validators: {
 		size : {min: 3, max: 100}
-	}
+	},
+	label: "Title"
 };
 
 exports.BlogPost.body = {
@@ -27,5 +29,6 @@ exports.BlogPost.future = {
 	type: 'date',
 	validators: {
 		date : {}
-	}
+	},
+	label: "Date in Future"
 };

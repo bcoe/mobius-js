@@ -11,6 +11,34 @@
 		<script type="text/javascript" src="public/javascript/mobius-client.js"></script>
 	</head>
 	<body>
+		
+	<script type="text/javascript">		
+		MobiusClient.ready(function (mobius) {
+			
+			mobius.loadModel('blog-post.js');
+			
+			var form = mobius.handleForm($('form[0]'), {
+				submitHook: function(err, params, modelName) {
+					if (err) {
+						$('#error').html('');
+						$.each(err, function(k, v) {
+							$(':input[name=' + modelName + '[' + v['field'] + ']]').addClass('error');
+							$('#error').append("<p>" + v['msg'] + "</p>");
+						});
+						return false;
+					} else {
+						return true;
+					}					
+				}
+			});
+			
+		});
+		
+		$(document).ready( function() {
+			$(".datepicker").datepicker();
+		});
+	</script>
+		
 	<%= body %>
 	</body>
 </html>

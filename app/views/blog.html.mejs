@@ -1,7 +1,0 @@
-<h1>Index For <%= title %></h1>
-<p>
-	You can find this view file in <i>app/views/blog.html.mejs</i>
-</p>
-<p>
-	The corresponding controller for this view is in <i><%= generatedFile %></i>
-</p>

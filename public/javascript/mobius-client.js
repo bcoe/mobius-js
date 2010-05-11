@@ -1,10 +1,41 @@
-// These variables deal with the require functionality. 
-var exports = {};
-var resigConstructor = {};
+/**
+ * Mobius-JS
+ *                   /\   \ 
+ *                  /  \   \          
+ *                 /    \   \
+ *                /      \   \
+ *               /   /\   \   \
+ *              /   /  \   \   \
+ *             /   /    \   \   \
+ *            /   /    / \   \   \
+ *           /   /    /   \   \   \
+ *          /   /    /---------'   \
+ *         /   /    /_______________\
+ *         \  /                     /
+ *          \/_____________________/                   
+ *
+ * Benjamin Coe (BenjaminCoe.com) - MIT Licensed.
+ *
+ * Description: The client side mobius object provides access
+ * to shared validators, models, and helpers on the browser-side.
+ */
+
+// Some data is injected in the global scope to make object
+// sharing between client and server easier. Doing this should
+// be kept to a minimum.
+
+// Mock out the 'exports' object used server-side.
+exports = {};
+resigConstructor = {}; // Mock out the constructor for a new resig class.
+
+// Lookup table for model constructors once they are loaded.
+var modelConstructors = {};
 
 /**
-* Mock out require functionality for client-side.
-*/
+ * Mocks out the require() function used on the server-side.
+ *
+ * @param {string} path path to dependent library.
+ */
 function require(path) {
 	var libs = {
 		'resig/resig' : resigConstructor,
@@ -13,92 +44,108 @@ function require(path) {
 	return libs[path];
 }
 
-// List of models to load.
-var models = [
-	"blog-post.js"
-];
-
-// Lookup table for model constructors once they are loaded.
-var modelConstructors = {};
+// The entry-point for the browser-side mobius library.
+MobiusClient = {};
+MobiusClient.ready = function(callback) {
+	MobiusClient.loadedCallback = callback;
+}
 
 /**
- * Run when document finishes loading.
+ * On document ready, we lazy load dependencies and callback
+ * to the listener registered with mobius.
  */
 $(document).ready(function() {
-	var Mobius = {};
-	
+
 	// Lazy load core dependencies.
 	exports = {};
 	LazyLoad.loadOnce([
 		'lib/resig/resig.js',
 	], function() {
-		
+	
 		// Store the resig  simple class constructor.
 		resigConstructor.Class = exports.Class;
-		
+			
 		// Load the main model class.
 		LazyLoad.loadOnce([
 			'lib/model.js',
-		], function() {
-			
-			// Lazy load dependent models.
-			exports = {};
-			for (var i in models) {
-				LazyLoad.loadOnce([
-					'models/' + models[i]
-				], function() {
-					for (var key in exports) {
-						modelConstructors[key] = exports[key];
-					}
-				});
-			}
-				
+		], function() {	
+			// Once we have the resig class and the model class 
+			// We can safely initialize the client-side mobius object.
+			initMobiusClient();
 		});	
 	});
-	
+
 	// Load validators.
 	LazyLoad.loadOnce([
 		'validators/validators.js',
 	], function() {
 	});
+});
+
+// Called when all bootstrapping steps are complete.
+function initMobiusClient() {
 	
-	// Change all date-picker classes into JQueryUI date-pickers.
-	$(".datepicker").datepicker();
+	/**
+ 	 *
+	 */
+	var Client = Class.extend({
+		init: function() {
+			console.log('Bootstrapping finished.');
+		},
+		
+		loadModel: function(modelFile) {
 	
-	// Override default form submit actions.
-	$('form').submit(function() {
-		var $this = $(this);
-		var name = $this.attr('name');
+			// load in a dependent model.
+			exports = {};
+			LazyLoad.loadOnce([
+				'models/' + modelFile
+			], function() {
+				for (var key in exports) {
+					modelConstructors[key] = exports[key];
+				}
+			});
+
+		},
 		
-		// Parameters to save.
-		var values = $this.serialize();
-		
-		var params = {};
-		$this.find(':input').removeClass('error');
-		$this.find(':input').each(function(k, v) {
-			var $input = $(this);
+		handleForm: function($form, params) {
+			var modelName = params['modelName'] || $form.attr('name');
+			var submitHook = params['submitHook'] || function () {};
 			
-			var extractParam = /^.*\[(.*)\].*$/; // Extract the field name.
-			
-			var name = $input.attr('name');
-			
-			if (name) { // Make sure the name attr is set.
-				name.match(extractParam);
-			 	name = RegExp.$1;
-				params[name] = $input.val();
-			}
-		});		
-		
-		// Validate the form parameters.
-		if (modelConstructors[name]) {
-			var model = new modelConstructors[name](null, modelConstructors[name]);
-			var errors = model.validate(params);
-			$('#error').html('');
-			$.each(errors, function(k, v) {
-				$(':input[name=' + name + '[' + v['field'] + ']]').addClass('error');
-				$('#error').append("<p>" + v['msg'] + "</p>");
+			// Override default form submit actions.
+			$form.submit(function() {
+				var $this = $(this);
+
+				// Copy the parameters from the form into an associative array.
+				var params = {};
+				$this.find(':input').each(function(k, v) {
+					var $input = $(this);
+					var extractParam = /^.*\[(.*)\].*$/; // Extract the field name.
+					var name = $input.attr('name');
+
+					if (name) { // Make sure the name attr is set.
+						name.match(extractParam);
+					 	name = RegExp.$1;
+						params[name] = $input.val();
+					}
+				});		
+
+				// Validate the form parameters.
+				if (modelConstructors[modelName]) {
+					var model = new modelConstructors[modelName](null, modelConstructors[modelName]);
+					var errors = model.validate(params);
+				}
+
+				// Return either errors or form parameters to callback.
+				if (errors.length > 0) {
+					return submitHook(errors, null, modelName);
+				}
+				return submitHook(null, params, modelName);
 			});
 		}
-		return false;
 	});
-});
+
+	// Create an instance of the client and return it to
+	// the client callback.
+	var client = new Client();
+	MobiusClient.loadedCallback(client);
+}

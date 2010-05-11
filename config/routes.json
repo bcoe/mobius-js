@@ -14,6 +14,20 @@
 	},
 	
 	{
+		"route" : "/catalogue",
+		"method" : "get",
+		"controller" : "catalogue",
+		"action" : "index"
+	},
+	
+	{
+		"route" : "/catalogue",
+		"method" : "post",
+		"controller" : "catalogue",
+		"action" : "index"
+	},
+	
+	{
 		"route" : "/blog",
 		"method" : "get",
 		"controller" : "blog",
