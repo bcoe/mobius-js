@@ -109,7 +109,7 @@ function initMobiusClient() {
 		
 		handleForm: function($form, params) {
 			var modelName = params['modelName'] || $form.attr('name');
-			var submitHook = params['submitHook'] || function () {};
+			var onSubmit = params['onSubmit'] || function () {};
 			
 			// Override default form submit actions.
 			$form.submit(function() {
@@ -137,9 +137,9 @@ function initMobiusClient() {
 
 				// Return either errors or form parameters to callback.
 				if (errors.length > 0) {
-					return submitHook(errors, null, modelName);
+					return onSubmit(errors, null, modelName);
 				}
-				return submitHook(null, params, modelName);
+				return onSubmit(null, params, modelName);
 			});
 		}
 	});

@@ -12,26 +12,25 @@
 	</head>
 	<body>
 		
-	<script type="text/javascript">		
-		MobiusClient.ready(function (mobius) {
-			
-			mobius.loadModel('blog-post.js');
-			
-			var form = mobius.handleForm($('form[0]'), {
-				submitHook: function(err, params, modelName) {
+	<script type="text/javascript">
+		MobiusClient.ready(function(client) {
+			client.loadModel('book.js');
+			client.handleForm($('form[name=Book]'), {
+				onSubmit: function(err, params, modelName) {
 					if (err) {
+						
 						$('#error').html('');
 						$.each(err, function(k, v) {
-							$(':input[name=' + modelName + '[' + v['field'] + ']]').addClass('error');
-							$('#error').append("<p>" + v['msg'] + "</p>");
+							$('#error').append(v['msg'] + "<br />");
 						});
+						
 						return false;
 					} else {
-						return true;
-					}					
+						console.log(params);
+						return false;
+					}
 				}
 			});
-			
 		});
 		
 		$(document).ready( function() {
