@@ -27,7 +27,7 @@
 						return false;
 					} else {
 						console.log(params);
-						return false;
+						return true;
 					}
 				}
 			});
