@@ -1,15 +1,15 @@
 [
 	{
-		"route" : "",
+		"route" : "/blog",
 		"method" : "get",
-		"controller" : "benjamin-coe",
+		"controller" : "blog-post",
 		"action" : "index"
 	},
 	
 	{
-		"route" : "",
+		"route" : "/blog",
 		"method" : "post",
-		"controller" : "benjamin-coe",
+		"controller" : "blog-post",
 		"action" : "index"
 	},
 	

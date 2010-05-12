@@ -59,7 +59,7 @@ $(document).ready(function() {
 	// Lazy load core dependencies.
 	exports = {};
 	LazyLoad.loadOnce([
-		'lib/resig/resig.js',
+		'/lib/resig/resig.js',
 	], function() {
 	
 		// Store the resig  simple class constructor.
@@ -67,7 +67,7 @@ $(document).ready(function() {
 			
 		// Load the main model class.
 		LazyLoad.loadOnce([
-			'lib/model.js',
+			'/lib/model.js',
 		], function() {	
 			// Once we have the resig class and the model class 
 			// We can safely initialize the client-side mobius object.
@@ -77,7 +77,7 @@ $(document).ready(function() {
 
 	// Load validators.
 	LazyLoad.loadOnce([
-		'validators/validators.js',
+		'/validators/validators.js',
 	], function() {
 	});
 });
@@ -98,7 +98,7 @@ function initMobiusClient() {
 			// load in a dependent model.
 			exports = {};
 			LazyLoad.loadOnce([
-				'models/' + modelFile
+				'/models/' + modelFile
 			], function() {
 				for (var key in exports) {
 					modelConstructors[key] = exports[key];

@@ -1,5 +1,5 @@
 var sys = require('sys');
-exports.BenjaminCoe = MobiusController.extend({
+exports.BlogPost = MobiusController.extend({
 	index: function() {	
 		var self = this;
 		

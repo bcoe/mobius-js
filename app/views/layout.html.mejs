@@ -7,15 +7,15 @@
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/ui-darkness/jquery-ui.css" type="text/css" />
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="public/javascript/lazyload-min.js"></script>
-		<script type="text/javascript" src="public/javascript/mobius-client.js"></script>
+		<script type="text/javascript" src="/public/javascript/lazyload-min.js"></script>
+		<script type="text/javascript" src="/public/javascript/mobius-client.js"></script>
 	</head>
 	<body>
 		
 	<script type="text/javascript">
 		MobiusClient.ready(function(client) {
-			client.loadModel('book.js');
-			client.handleForm($('form[name=Book]'), {
+			client.loadModel('blog-post.js');
+			client.handleForm($('form[name=BlogPost]'), {
 				onSubmit: function(err, params, modelName) {
 					if (err) {
 						
