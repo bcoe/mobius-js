@@ -3,5 +3,6 @@ Date: <i><%= post ? post.date : '' %></i>
 <p>
 	<%=h( post ? post.body : '' )%>
 </p>
+<%= partial('awesome.html.mejs') %>
 <hr />
 	<%=form( MobiusModel.BlogPost )%>

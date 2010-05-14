@@ -21,17 +21,10 @@
 	},
 	
 	{
-		"route" : "/catalogue",
-		"method" : "post",
-		"controller" : "catalogue",
-		"action" : "index"
-	},
-	
-	{
-		"route" : "/blog",
+		"route" : "/documentation/:file",
 		"method" : "get",
-		"controller" : "blog",
-		"action" : "index"
+		"type" : "static",
+		"path" : "documentation/"
 	},
 	
 	{
