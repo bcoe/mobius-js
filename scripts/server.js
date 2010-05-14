@@ -45,7 +45,7 @@ configure(function(){
 	
 	// Set the views directory.
 	set('views', function(){ return set('root') + '/../app/views' });
-});
+});˝
 run(serverConfiguration.port); // Start the express server.
 
 // The server-side processing stack provides synchronous access to

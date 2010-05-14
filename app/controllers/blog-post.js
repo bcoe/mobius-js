@@ -4,7 +4,6 @@ exports.BlogPost = MobiusController.extend({
 		var self = this;
 		
 		if (this.params['BlogPost']) {
-			this.params['BlogPost']['date'] = new Date(this.params['BlogPost']['date']);
 			try {
 				MobiusModel.BlogPost.create(this.params['BlogPost']);
 			} catch (e) {
