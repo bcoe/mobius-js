@@ -42,6 +42,7 @@ configure(function(){
 	
 	// Load static routing.
 	use(require('express/plugins/static').Static, {path: './public/'});
+	use(require('express/plugins/cookie').Cookie);
 	
 	// Set the views directory.
 	set('views', function(){ return set('root') + '/../app/views' });
