@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>
- Overview
+mobius-js Overview
 </title>
 <link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
 <script>
@@ -38,7 +38,7 @@ function asd() {
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top">
 <em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -117,11 +117,14 @@ function asd() {
 var resig = require(<span class="literal">'resig/resig'</span>);
 var sys = require(<span class="literal">'sys'</span>);
 var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+var webHelpers = require(<span class="literal">'mobius-js/helpers/web-helpers'</span>)
 
 <span class="comment">/**
  * A Mobius controller inherits from a Resig class.
  */</span>
 MobiusController = resig.Class.extend( {
+	cookies: {},
+	rendered: false
 });
 
 <span class="comment">/**
@@ -155,12 +158,16 @@ MobiusController.<span class="reserved">prototype</span>.execute = <span class="
 	
 	<span class="reserved">this</span>.express = express;
 	<span class="reserved">this</span>._loadParams();
+	<span class="reserved">this</span>._loadCookies();
 	<span class="reserved">this</span>._invokeAction(<span class="reserved">this</span>.action);
-	<span class="reserved">this</span>.mobiusProcessingStack.render({
-			self : <span class="reserved">this</span>,
-			view : <span class="reserved">this</span>.renderAction + <span class="literal">'.html.mejs'</span>, 
-			options : {},
-		}, <span class="reserved">this</span>._render);
+	
+	<span class="reserved">if</span> (!<span class="reserved">this</span>.rendered) {
+		<span class="reserved">this</span>.mobiusProcessingStack.render({
+				self : <span class="reserved">this</span>,
+				view : <span class="reserved">this</span>.renderAction + <span class="literal">'.html.mejs'</span>, 
+				options : {},
+			}, <span class="reserved">this</span>._render);
+	}
 },
 
 <span class="comment">/**
@@ -173,6 +180,8 @@ MobiusController.<span class="reserved">prototype</span>.execute = <span class="
  * <span class="attrib">@public</span>
  */</span>
 MobiusController.<span class="reserved">prototype</span>.render = <span class="reserved">function</span>(view, options) {
+	var options = options || {};
+	<span class="reserved">this</span>.rendered = true;
 	<span class="reserved">this</span>.mobiusProcessingStack.render({
 		self : <span class="reserved">this</span>,
 		view : view,
@@ -191,7 +200,14 @@ MobiusController.<span class="reserved">prototype</span>.render = <span class="r
  * <span class="attrib">@private</span>
  */</span>
 MobiusController.<span class="reserved">prototype</span>._render = <span class="reserved">function</span>(params) {
+	params[<span class="literal">'self'</span>]._setCookies();
+	
 	params[<span class="literal">'options'</span>][<span class="literal">'locals'</span>] = params[<span class="literal">'self'</span>]._getLocals();
+	
+	<span class="comment">// Add some helper functions to locals.</span>
+	params[<span class="literal">'options'</span>][<span class="literal">'locals'</span>][<span class="literal">'partial'</span>] = <span class="reserved">function</span>(partial) {
+		<span class="reserved">return</span> params[<span class="literal">'self'</span>].express.partial(partial);
+	}
 	
 	params[<span class="literal">'self'</span>].express.render(params[<span class="literal">'view'</span>], params[<span class="literal">'options'</span>]);
 },
@@ -234,6 +250,31 @@ MobiusController.<span class="reserved">prototype</span>._getLocals = <span clas
 },
 
 <span class="comment">/**
+ * Push the current cookies into the local cookie array.
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@private</span>
+ */</span>
+MobiusController.<span class="reserved">prototype</span>._loadCookies = <span class="reserved">function</span>() {
+	<span class="reserved">for</span> (var key in <span class="reserved">this</span>.express.cookies) {
+		<span class="reserved">this</span>.cookies[key] = <span class="reserved">this</span>.express.cookies[key];
+	}
+}
+
+<span class="comment">/**
+ * Update all cookies that have been set during this
+ * session.
+ *
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@private</span>
+ */</span>
+MobiusController.<span class="reserved">prototype</span>._setCookies = <span class="reserved">function</span>() {
+	<span class="reserved">for</span> (var key in <span class="reserved">this</span>.cookies) {
+		<span class="reserved">this</span>.express.cookie(key, <span class="reserved">this</span>.cookies[key]);
+	}
+}
+
+<span class="comment">/**
  * Merge get and post parameters into the same struct.
  * call helper functions to create arrays from magic 
  * post syntax.
@@ -248,7 +289,7 @@ MobiusController.<span class="reserved">prototype</span>._loadParams = <span cla
 	<span class="reserved">if</span> (<span class="reserved">this</span>.express.params.get &amp;&amp; <span class="reserved">this</span>.express.params.post) {
 		<span class="comment">// Merge the get and post parameters.</span>
 		<span class="reserved">for</span> (var key in <span class="reserved">this</span>.express.params.post) {
-			<span class="reserved">this</span>.express.params.get[key] = express.params.post[key];
+			<span class="reserved">this</span>.express.params.get[key] = <span class="reserved">this</span>.express.params.post[key];
 		}
 		<span class="reserved">this</span>.params = <span class="reserved">this</span>.express.params.get;
 	} <span class="reserved">else</span> 
@@ -287,7 +328,7 @@ MobiusController.<span class="reserved">prototype</span>._loadParams = <span cla
 </table>
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top"><em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -318,6 +359,6 @@ MobiusController.<span class="reserved">prototype</span>._loadParams = <span cla
 <font size="-1">
 
 </font>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May 15 07:53:00 2010</div>
 </body>
 </html>

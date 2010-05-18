@@ -28,11 +28,13 @@ var sys = require('sys');
 var resig = require('resig/resig');
 var helpers = require('mobius-js/helpers/helpers');
 var stack = require('mobius-js/processing-stack');
-var bootstrap = require('mobius-js/bootstrap')
+var bootstrap = require('mobius-js/bootstrap');
+var dom = require('mobius-js/parsers/xml-dom')
 
 require('express');
 require('mobius-js/controller');
 require('mobius-js/model');
+require('mobius-js/task');
 
 // Configure the Express DSL server.
 var serverConfiguration = helpers.loadConfiguration('server');
@@ -59,6 +61,20 @@ var controllers = bootstrap.loadControllers(function() {});
 var models = bootstrap.loadModels(function() {
 	bootstrap.createIndexes(models, mobiusProcessingStack);
 	bootstrap.initializeControllers(controllers, models, mobiusProcessingStack);	
+});
+
+// Load in tasks and setup a timer to execute them.
+var tasks = bootstrap.loadTasks(function() {
+	
+	setInterval(function () {
+		var date = new Date();
+		var ticks = date.getTime();
+
+		for (var key in tasks) {
+			tasks[key]._execute(ticks);
+		}
+	}, 1000);
+	
 });
 
 // Load in all of the routes described in routes.json.

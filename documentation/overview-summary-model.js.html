@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>
- Overview
+mobius-js Overview
 </title>
 <link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
 <script>
@@ -38,7 +38,7 @@ function asd() {
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top">
 <em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -114,9 +114,9 @@ function asd() {
  */</span>
 
 <span class="comment">// Dependencies.</span>
-var sys = require(<span class="literal">'sys'</span>);
 var resig = require(<span class="literal">'resig/resig'</span>);
 var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
+var validators = require(<span class="literal">'mobius-js/validators/validators'</span>);
 
 <span class="comment">/**
  * A Mobius model inherits from a Resig class.
@@ -129,12 +129,28 @@ MobiusModel = resig.Class.extend( {
  * MongoDB provides the persistent storage. Note: Do not access this method
  * directly, instead use MobiusModel.extend({});
  *
+ * <span class="attrib">@param</span> {object} processingStack synchronous processing stack.
+ * <span class="attrib">@param</span> {class} constructor constructor which can be used to create new instance of this class.
  * <span class="attrib">@type</span> void
  * <span class="attrib">@public</span>
  */</span>
-MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack) {
+MobiusModel.<span class="reserved">prototype</span>.init = <span class="reserved">function</span>(processingStack, constructor) {
 	<span class="reserved">this</span>.processingStack = processingStack;
+	<span class="reserved">this</span>.constructor = constructor;
 },
+
+<span class="comment">/**
+ * Map parameters onto a new instance of this class.
+ *
+ * <span class="attrib">@param</span> {object} params key value pairs of instance variables.
+ * <span class="attrib">@type</span> void
+ * <span class="attrib">@public</span>
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.loadParameters = <span class="reserved">function</span>(params) {
+	<span class="reserved">for</span> (var key in params) {
+		<span class="reserved">this</span>[key] = params[key];
+	}
+}
 
 <span class="comment">/**
  * Close the database connection.
@@ -155,10 +171,35 @@ MobiusModel.<span class="reserved">prototype</span>.close = <span class="reserve
  * <span class="attrib">@public</span>
  */</span>
 MobiusModel.<span class="reserved">prototype</span>.create = <span class="reserved">function</span>(paramsTemp) {
+	var errors = <span class="reserved">this</span>.validate(paramsTemp);
+	<span class="reserved">if</span> (errors.length &gt; 0) {
+		throw {
+			type : <span class="literal">"ValidationException"</span>,
+			errors : errors
+		}
+	}
+	
 	params = {};
 	params[<span class="literal">'values'</span>] = paramsTemp;
 	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
 	<span class="reserved">this</span>.processingStack.create(params);
+},
+
+<span class="comment">/**
+ * Validate parameters.
+ */</span>
+MobiusModel.<span class="reserved">prototype</span>.validate = <span class="reserved">function</span>(params) {
+	var errors = [];
+	<span class="reserved">for</span> (var key in <span class="reserved">this</span>.constructor) {
+		<span class="reserved">if</span> (key != <span class="literal">'constructor'</span> &amp;&amp; key != <span class="literal">'extend'</span> &amp;&amp; key != <span class="literal">'include'</span>) {
+			<span class="reserved">if</span> (<span class="reserved">this</span>.constructor[key][<span class="literal">'validators'</span>]) {
+				<span class="reserved">for</span> (var validatorKey in <span class="reserved">this</span>.constructor[key][<span class="literal">'validators'</span>]) {
+					errors = validators[validatorKey](params[key], key, <span class="reserved">this</span>.constructor[key][<span class="literal">'validators'</span>][validatorKey], errors);
+				}
+			}
+		}
+	}
+	<span class="reserved">return</span> errors;
 },
 
 <span class="comment">/**
@@ -183,10 +224,19 @@ MobiusModel.<span class="reserved">prototype</span>.createIndex = <span class="r
  * <span class="attrib">@public</span>
  */</span>
 MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved">function</span>(query, sort, callback) {
+	<span class="comment">// This function behaves differently depending on the</span>
+	<span class="comment">// parameters.</span>
+	<span class="reserved">if</span> (typeof sort == <span class="literal">'function'</span>) {
+		callback = sort;
+		sort = {};
+	}
+
 	params = {};
 	params[<span class="literal">'query'</span>] = query;
 	
-	<span class="comment">// Map the sort hash onto an array.</span>
+	<span class="comment">// Map the sort hash onto an array. This is done because the</span>
+	<span class="comment">// mongodb connector accepts sorting parameters, in I feel</span>
+	<span class="comment">// a wacky fasion.</span>
 	params[<span class="literal">'sort'</span>] = {};
 	params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>] = [];
 	<span class="reserved">for</span> (var key in sort) {
@@ -194,8 +244,21 @@ MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved
 		params[<span class="literal">'sort'</span>][<span class="literal">'sort'</span>].push(temp);
 	}
 	
+	<span class="comment">// Add the class name into the parameters.</span>
 	params[<span class="literal">'collectionName'</span>] = <span class="reserved">this</span>.className;
-	<span class="reserved">this</span>.processingStack.find(params, callback);
+	
+	<span class="comment">// We need to intercept the results and map them onto</span>
+	<span class="comment">// an instance of this class.</span>
+	var self = <span class="reserved">this</span>;
+	<span class="reserved">this</span>.processingStack.find(params, <span class="reserved">function</span>(results) {
+		temp = [];
+		<span class="reserved">for</span> (var key in results) {
+			var c = new self.constructor(self.processingStack, self.constructor);
+			c.loadParameters(results[key]);
+			temp.push(c);
+		}
+		callback(temp);
+	});
 }</pre>
 	<hr>
 
@@ -223,7 +286,7 @@ MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved
 </table>
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top"><em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -254,6 +317,6 @@ MobiusModel.<span class="reserved">prototype</span>.find = <span class="reserved
 <font size="-1">
 
 </font>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May 15 07:53:00 2010</div>
 </body>
 </html>

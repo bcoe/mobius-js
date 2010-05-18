@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>
- Overview
+mobius-js Overview
 </title>
 <link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
 <script>
@@ -38,7 +38,7 @@ function asd() {
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top">
 <em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -114,8 +114,7 @@ function asd() {
  */</span>
 
 <span class="comment">// Dependencies</span>
-require.paths.unshift(<span class="literal">'./app/controllers'</span>);
-require.paths.unshift(<span class="literal">'./app/models'</span>)
+require.paths.unshift(<span class="literal">'./app'</span>);
 var fs = require(<span class="literal">'fs'</span>);
 var sys = require(<span class="literal">'sys'</span>);
 var helpers = require(<span class="literal">'mobius-js/helpers/helpers'</span>);
@@ -141,7 +140,7 @@ Bootstrap.<span class="reserved">prototype</span>.loadControllers = <span class=
 		<span class="reserved">for</span> (var key in files) {
 			var controllerFile = files[key].split(<span class="literal">'.'</span>)[0];
 			<span class="reserved">if</span> (files[key].split(<span class="literal">'.'</span>)[1] == <span class="literal">'js'</span>) {
-				controllers[controllerFile.toLowerCase()] = (require(controllerFile))[helpers.stringToClassName(controllerFile, <span class="literal">'-'</span>)];
+				controllers[controllerFile.toLowerCase()] = (require(<span class="literal">'controllers/'</span> + controllerFile))[helpers.stringToClassName(controllerFile, <span class="literal">'-'</span>)];
 			}
 		}
 		
@@ -168,7 +167,7 @@ Bootstrap.<span class="reserved">prototype</span>.loadModels = <span class="rese
 
 			var modelFile = files[key].split(<span class="literal">'.'</span>)[0];
 			<span class="reserved">if</span> (files[key].split(<span class="literal">'.'</span>)[1] == <span class="literal">'js'</span>) {
-				models[modelFile.toLowerCase()] = (require(modelFile))[helpers.stringToClassName(modelFile, <span class="literal">'-'</span>)];
+				models[modelFile.toLowerCase()] = (require(<span class="literal">'models/'</span> + modelFile))[helpers.stringToClassName(modelFile, <span class="literal">'-'</span>)];
 			}
 		}
 		
@@ -190,6 +189,7 @@ exports.loadModels = Bootstrap.<span class="reserved">prototype</span>.loadModel
  */</span>
 Bootstrap.<span class="reserved">prototype</span>.initializeRoutes = <span class="reserved">function</span>(routes, controllers, mobiusProcessingStack) {
 	<span class="reserved">for</span> (var key in routes) {	
+		
 		var callback = <span class="reserved">function</span>(controller, action, id) {
 												
 			<span class="comment">// Determine the action and controller values.</span>
@@ -203,10 +203,25 @@ Bootstrap.<span class="reserved">prototype</span>.initializeRoutes = <span class
 			controllerInstance = new controllers[controller.toLowerCase()](mobiusProcessingStack);
 			controllerInstance.execute(controller, action, <span class="reserved">this</span>);
 		}
+		
+		var staticCallback = <span class="reserved">function</span>(file) {
+			var path = arguments.callee.<span class="reserved">prototype</span>.path || <span class="literal">''</span>;
+			
+			<span class="reserved">if</span> (file) {
+				<span class="reserved">this</span>.sendfile(path + <span class="literal">'/'</span> + file);
+			} <span class="reserved">else</span> {
+				<span class="reserved">this</span>.sendfile(path);
+			}
+		}
+		
 		callback.<span class="reserved">prototype</span>.controller = routes[key][<span class="literal">'controller'</span>];
 		callback.<span class="reserved">prototype</span>.action = routes[key][<span class="literal">'action'</span>];
-
-		<span class="reserved">if</span> (routes[key][<span class="literal">'method'</span>] == <span class="literal">'post'</span>) {
+		
+		staticCallback.<span class="reserved">prototype</span>.path = routes[key][<span class="literal">'path'</span>];
+		
+		<span class="reserved">if</span> (routes[key][<span class="literal">'type'</span>] == <span class="literal">'static'</span>) {
+			get(routes[key][<span class="literal">'route'</span>], staticCallback);
+		} <span class="reserved">else</span> <span class="reserved">if</span> (routes[key][<span class="literal">'method'</span>] == <span class="literal">'post'</span>) {
 			post(routes[key][<span class="literal">'route'</span>], callback);
 		} <span class="reserved">else</span> { <span class="comment">// GET'er Done.</span>
 			get(routes[key][<span class="literal">'route'</span>], callback);
@@ -228,7 +243,7 @@ Bootstrap.<span class="reserved">prototype</span>.createIndexes = <span class="r
 		
 		var modelClassName = helpers.stringToClassName(modelKey, <span class="literal">'-'</span>);
 		models[modelKey].<span class="reserved">prototype</span>[<span class="literal">'className'</span>] = modelClassName;
-		var modelInstance = new models[modelKey](mobiusProcessingStack);
+		var modelInstance = new models[modelKey](mobiusProcessingStack, models[modelKey]);
 		
 		var indexes = [<span class="literal">'meta'</span>, [<span class="literal">'_id'</span>, 1]];
 		
@@ -262,7 +277,7 @@ exports.createIndexes = Bootstrap.<span class="reserved">prototype</span>.create
  */</span>
 Bootstrap.<span class="reserved">prototype</span>.initializeControllers = <span class="reserved">function</span>(controllers, models, mobiusProcessingStack) {
 	<span class="reserved">for</span> (var modelKey in models) {
-		var modelInstance = new models[modelKey](mobiusProcessingStack);
+		var modelInstance = new models[modelKey](mobiusProcessingStack, models[modelKey]);
 		var modelClassName = helpers.stringToClassName(modelKey, <span class="literal">'-'</span>);
 		<span class="reserved">for</span> (var controllerKey in controllers) {
 			MobiusModel[modelClassName] = modelInstance;
@@ -296,7 +311,7 @@ exports.initializeControllers = Bootstrap.<span class="reserved">prototype</span
 </table>
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top"><em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -327,6 +342,6 @@ exports.initializeControllers = Bootstrap.<span class="reserved">prototype</span
 <font size="-1">
 
 </font>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May 15 07:53:00 2010</div>
 </body>
 </html>

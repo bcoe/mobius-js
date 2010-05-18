@@ -2,7 +2,7 @@
 <html>
 <head>
 <title>
- Overview
+mobius-js Overview
 </title>
 <link rel ="stylesheet" type="text/css" href="stylesheet.css" title="Style">
 <script>
@@ -38,7 +38,7 @@ function asd() {
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top">
 <em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -133,31 +133,542 @@ function asd() {
 <span class="comment">// Dependencies.</span>
 var sys = require(<span class="literal">'sys'</span>);
 var utils = require(<span class="literal">'express/utils'</span>);
+var webHelpers = require(<span class="literal">'mobius-js/helpers/web-helpers'</span>);
+
 
 <span class="comment">// Helper functions available in templates.</span>
 var h = utils.escape;
-
-
-
-<span class="comment">// This class is created for documentation purposes.</span>
-<span class="reserved">function</span> MEJS() {};
+var form = webHelpers.form;
 
 <span class="comment">/**
+ * EJS Developer 1.0 Production
+ * http://embeddedjs.com/
+ */</span>
+(<span class="reserved">function</span>(){
+
+var rsplit = <span class="reserved">function</span>(string, regex) {
+	var result = regex.exec(string),retArr = new Array(), first_idx, last_idx, first_bit;
+	<span class="reserved">while</span> (result != null)
+	
+	{
+		first_idx = result.index; last_idx = regex.lastIndex;
+		<span class="reserved">if</span> ((first_idx) != 0)
+		{
+			first_bit = string.substring(0,first_idx);
+			retArr.push(string.substring(0,first_idx));
+			string = string.slice(first_idx);
+		}		
+		retArr.push(result[0]);
+		string = string.slice(result[0].length);
+		result = regex.exec(string);	
+	}
+	<span class="reserved">if</span> (! string == <span class="literal">''</span>)
+	{
+		retArr.push(string);
+	}
+	<span class="reserved">return</span> retArr;
+},
+chop =  <span class="reserved">function</span>(string){
+    <span class="reserved">return</span> string.substr(0, string.length - 1);
+},
+extend = <span class="reserved">function</span>(d, s){
+    <span class="reserved">for</span>(var n in s){
+        <span class="reserved">if</span>(s.hasOwnProperty(n))  d[n] = s[n]
+    }
+}
+
+
+EJS = <span class="reserved">function</span>( options ){
+	options = typeof options == <span class="literal">"string"</span> ? {view: options} : options
+    <span class="reserved">this</span>.set_options(options);
+	<span class="reserved">if</span>(options.precompiled){
+		<span class="reserved">this</span>.template = {};
+		<span class="reserved">this</span>.template.process = options.precompiled;
+		EJS.update(<span class="reserved">this</span>.name, <span class="reserved">this</span>);
+		<span class="reserved">return</span>;
+	}
+    <span class="reserved">if</span>(options.element)
+	{
+		<span class="reserved">if</span>(typeof options.element == <span class="literal">'string'</span>){
+			var name = options.element
+			options.element = document.getElementById(  options.element )				
+			<span class="reserved">if</span>(options.element == null) throw name+<span class="literal">'does not exist!'</span>
+		}
+		
+		<span class="reserved">if</span>(options.element.value){
+			<span class="reserved">this</span>.text = options.element.value
+		}<span class="reserved">else</span>{
+			<span class="reserved">this</span>.text = options.element.innerHTML
+		}
+		<span class="reserved">this</span>.name = options.element.id
+		<span class="reserved">this</span>.type = <span class="literal">'['</span>
+	}<span class="reserved">else</span> <span class="reserved">if</span>(options.url){
+        options.url = EJS.endExt(options.url, <span class="reserved">this</span>.extMatch);
+		<span class="reserved">this</span>.name = <span class="reserved">this</span>.name ? <span class="reserved">this</span>.name : options.url;
+        var url = options.url
+        <span class="comment">//options.view = options.absolute_url || options.view || options.;</span>
+		var template = EJS.get(<span class="reserved">this</span>.name <span class="comment">/*url*/</span>, <span class="reserved">this</span>.cache);
+		<span class="reserved">if</span> (template) <span class="reserved">return</span> template;
+	    <span class="reserved">if</span> (template == EJS.INVALID_PATH) <span class="reserved">return</span> null;
+        try{
+            <span class="reserved">this</span>.text = EJS.request( url+(<span class="reserved">this</span>.cache ? <span class="literal">''</span> : <span class="literal">'?'</span>+Math.random() ));
+        }catch(e){}
+
+		<span class="reserved">if</span>(<span class="reserved">this</span>.text == null){
+            throw( {type: <span class="literal">'EJS'</span>, message: <span class="literal">'There is no template at '</span>+url}  );
+		}
+		<span class="comment">//this.name = url;</span>
+	}
+	var template = new EJS.Compiler(<span class="reserved">this</span>.text, <span class="reserved">this</span>.type);
+
+	template.compile(options, <span class="reserved">this</span>.name);
+
+
+	EJS.update(<span class="reserved">this</span>.name, <span class="reserved">this</span>);
+	<span class="reserved">this</span>.template = template;
+};
+<span class="comment">/* <span class="attrib">@Prototype</span>*/</span>
+EJS.<span class="reserved">prototype</span> = {
+	<span class="comment">/**
+	 * Renders an object with extra view helpers attached to the view.
+	 * <span class="attrib">@param</span> {Object} object data to be rendered
+	 * <span class="attrib">@param</span> {Object} extra_helpers an object with additonal view helpers
+	 * <span class="attrib">@return</span> {String} returns the result of the string
+	 */</span>
+    render : <span class="reserved">function</span>(object, extra_helpers){
+        object = object || {};
+        <span class="reserved">this</span>._extra_helpers = extra_helpers;
+		var v = new EJS.Helpers(object, extra_helpers || {});
+		<span class="reserved">return</span> <span class="reserved">this</span>.template.process.call(object, object,v);
+	},
+    update : <span class="reserved">function</span>(element, options){
+        <span class="reserved">if</span>(typeof element == <span class="literal">'string'</span>){
+			element = document.getElementById(element)
+		}
+		<span class="reserved">if</span>(options == null){
+			_template = <span class="reserved">this</span>;
+			<span class="reserved">return</span> <span class="reserved">function</span>(object){
+				EJS.<span class="reserved">prototype</span>.update.call(_template, element, object)
+			}
+		}
+		<span class="reserved">if</span>(typeof options == <span class="literal">'string'</span>){
+			params = {}
+			params.url = options
+			_template = <span class="reserved">this</span>;
+			params.onComplete = <span class="reserved">function</span>(request){
+				var object = eval( request.responseText )
+				EJS.<span class="reserved">prototype</span>.update.call(_template, element, object)
+			}
+			EJS.ajax_request(params)
+		}<span class="reserved">else</span>
+		{
+			element.innerHTML = <span class="reserved">this</span>.render(options)
+		}
+    },
+	out : <span class="reserved">function</span>(){
+		<span class="reserved">return</span> <span class="reserved">this</span>.template.out;
+	},
+    <span class="comment">/**
+     * Sets options on this view to be rendered with.
+     * <span class="attrib">@param</span> {Object} options
+     */</span>
+	set_options : <span class="reserved">function</span>(options){
+        <span class="reserved">this</span>.type = options.type || EJS.type;
+		<span class="reserved">this</span>.cache = options.cache != null ? options.cache : EJS.cache;
+		<span class="reserved">this</span>.text = options.text || null;
+		<span class="reserved">this</span>.name =  options.name || null;
+		<span class="reserved">this</span>.ext = options.ext || EJS.ext;
+		<span class="reserved">this</span>.extMatch = new RegExp(<span class="reserved">this</span>.ext.replace(/\./, <span class="literal">'\.'</span>));
+	}
+};
+EJS.endExt = <span class="reserved">function</span>(path, match){
+	<span class="reserved">if</span>(!path) <span class="reserved">return</span> null;
+	match.lastIndex = 0
+	<span class="reserved">return</span> path+ (match.test(path) ? <span class="literal">''</span> : <span class="reserved">this</span>.ext )
+}
+
+
+
+
+<span class="comment">/* <span class="attrib">@Static</span>*/</span>
+EJS.Scanner = <span class="reserved">function</span>(source, left, right) {
+
+    extend(<span class="reserved">this</span>,
+        {left_delimiter: 	left +<span class="literal">'%'</span>,
+         right_delimiter: 	<span class="literal">'%'</span>+right,
+         double_left: 		left+<span class="literal">'%%'</span>,
+         double_right:  	<span class="literal">'%%'</span>+right,
+         left_equal: 		left+<span class="literal">'%='</span>,
+         left_comment: 	left+<span class="literal">'%#'</span>})
+
+	<span class="reserved">this</span>.SplitRegexp = left==<span class="literal">'['</span> ? /(\[%%)|(%%\])|(\[%=)|(\[%#)|(\[%)|(%\]\n)|(%\])|(\n)/ : new RegExp(<span class="literal">'('</span>+<span class="reserved">this</span>.double_left+<span class="literal">')|(%%'</span>+<span class="reserved">this</span>.double_right+<span class="literal">')|('</span>+<span class="reserved">this</span>.left_equal+<span class="literal">')|('</span>+<span class="reserved">this</span>.left_comment+<span class="literal">')|('</span>+<span class="reserved">this</span>.left_delimiter+<span class="literal">')|('</span>+<span class="reserved">this</span>.right_delimiter+<span class="literal">'\n)|('</span>+<span class="reserved">this</span>.right_delimiter+<span class="literal">')|(\n)'</span>) ;
+
+	<span class="reserved">this</span>.source = source;
+	<span class="reserved">this</span>.stag = null;
+	<span class="reserved">this</span>.lines = 0;
+};
+
+EJS.Scanner.to_text = <span class="reserved">function</span>(input){
+	<span class="reserved">if</span>(input == null || input === undefined)
+        <span class="reserved">return</span> <span class="literal">''</span>;
+    <span class="reserved">if</span>(input instanceof Date)
+		<span class="reserved">return</span> input.toDateString();
+	<span class="reserved">if</span>(input.toString) 
+        <span class="reserved">return</span> input.toString();
+	<span class="reserved">return</span> <span class="literal">''</span>;
+};
+
+EJS.Scanner.<span class="reserved">prototype</span> = {
+  scan: <span class="reserved">function</span>(block) {
+     scanline = <span class="reserved">this</span>.scanline;
+	 regex = <span class="reserved">this</span>.SplitRegexp;
+	 <span class="reserved">if</span> (! <span class="reserved">this</span>.source == <span class="literal">''</span>)
+	 {
+	 	 var source_split = rsplit(<span class="reserved">this</span>.source, /\n/);
+	 	 <span class="reserved">for</span>(var i=0; i&lt;source_split.length; i++) {
+		 	 var item = source_split[i];
+			 <span class="reserved">this</span>.scanline(item, regex, block);
+		 }
+	 }
+  },
+  scanline: <span class="reserved">function</span>(line, regex, block) {
+	 <span class="reserved">this</span>.lines++;
+	 var line_split = rsplit(line, regex);
+ 	 <span class="reserved">for</span>(var i=0; i&lt;line_split.length; i++) {
+	   var token = line_split[i];
+       <span class="reserved">if</span> (token != null) {
+		   	try{
+	         	block(token, <span class="reserved">this</span>);
+		 	}catch(e){
+				throw {type: <span class="literal">'EJS.Scanner'</span>, line: <span class="reserved">this</span>.lines};
+			}
+       }
+	 }
+  }
+};
+
+
+EJS.Buffer = <span class="reserved">function</span>(pre_cmd, post_cmd) {
+	<span class="reserved">this</span>.line = new Array();
+	<span class="reserved">this</span>.script = <span class="literal">""</span>;
+	<span class="reserved">this</span>.pre_cmd = pre_cmd;
+	<span class="reserved">this</span>.post_cmd = post_cmd;
+	<span class="reserved">for</span> (var i=0; i&lt;<span class="reserved">this</span>.pre_cmd.length; i++)
+	{
+		<span class="reserved">this</span>.push(pre_cmd[i]);
+	}
+};
+EJS.Buffer.<span class="reserved">prototype</span> = {
+
+  push: <span class="reserved">function</span>(cmd) {
+	<span class="reserved">this</span>.line.push(cmd);
+  },
+
+  cr: <span class="reserved">function</span>() {
+	<span class="reserved">this</span>.script = <span class="reserved">this</span>.script + <span class="reserved">this</span>.line.join(<span class="literal">'; '</span>);
+	<span class="reserved">this</span>.line = new Array();
+	<span class="reserved">this</span>.script = <span class="reserved">this</span>.script + <span class="literal">"\n"</span>;
+  },
+
+  close: <span class="reserved">function</span>() {
+	<span class="reserved">if</span> (<span class="reserved">this</span>.line.length &gt; 0)
+	{
+		<span class="reserved">for</span> (var i=0; i&lt;<span class="reserved">this</span>.post_cmd.length; i++){
+			<span class="reserved">this</span>.push(pre_cmd[i]);
+		}
+		<span class="reserved">this</span>.script = <span class="reserved">this</span>.script + <span class="reserved">this</span>.line.join(<span class="literal">'; '</span>);
+		line = null;
+	}
+  }
+
+};
+
+
+EJS.Compiler = <span class="reserved">function</span>(source, left) {
+    <span class="reserved">this</span>.pre_cmd = [<span class="literal">'var ___ViewO = [];'</span>];
+	<span class="reserved">this</span>.post_cmd = new Array();
+	<span class="reserved">this</span>.source = <span class="literal">' '</span>;	
+	<span class="reserved">if</span> (source != null)
+	{
+		<span class="reserved">if</span> (typeof source == <span class="literal">'string'</span>)
+		{
+		    source = source.replace(/\r\n/g, <span class="literal">"\n"</span>);
+            source = source.replace(/\r/g,   <span class="literal">"\n"</span>);
+			<span class="reserved">this</span>.source = source;
+		}<span class="reserved">else</span> <span class="reserved">if</span> (source.innerHTML){
+			<span class="reserved">this</span>.source = source.innerHTML;
+		} 
+		<span class="reserved">if</span> (typeof <span class="reserved">this</span>.source != <span class="literal">'string'</span>){
+			<span class="reserved">this</span>.source = <span class="literal">""</span>;
+		}
+	}
+	left = left || <span class="literal">'&lt;'</span>;
+	var right = <span class="literal">'&gt;'</span>;
+	switch(left) {
+		case <span class="literal">'['</span>:
+			right = <span class="literal">']'</span>;
+			break;
+		case <span class="literal">'&lt;'</span>:
+			break;
+		default:
+			throw left+<span class="literal">' is not a supported deliminator'</span>;
+			break;
+	}
+	<span class="reserved">this</span>.scanner = new EJS.Scanner(<span class="reserved">this</span>.source, left, right);
+	<span class="reserved">this</span>.out = <span class="literal">''</span>;
+};
+EJS.Compiler.<span class="reserved">prototype</span> = {
+  compile: <span class="reserved">function</span>(options, name) {
+  	options = options || {};
+	<span class="reserved">this</span>.out = <span class="literal">''</span>;
+	var put_cmd = <span class="literal">"___ViewO.push("</span>;
+	var insert_cmd = put_cmd;
+	var buff = new EJS.Buffer(<span class="reserved">this</span>.pre_cmd, <span class="reserved">this</span>.post_cmd);		
+	var content = <span class="literal">''</span>;
+	var clean = <span class="reserved">function</span>(content)
+	{
+	    content = content.replace(/\\/g, <span class="literal">'\\\\'</span>);
+        content = content.replace(/\n/g, <span class="literal">'\\n'</span>);
+        content = content.replace(/<span class="literal">"/g,  '\\"</span><span class="literal">');
+        return content;
+	};
+	this.scanner.scan(function(token, scanner) {
+		if (scanner.stag == null)
+		{
+			switch(token) {
+				case '</span>\n<span class="literal">':
+					content = content + "\n";
+					buff.push(put_cmd + '</span><span class="literal">"' + clean(content) + '"</span>);<span class="literal">');
+					buff.cr();
+					content = '</span><span class="literal">';
+					break;
+				case scanner.left_delimiter:
+				case scanner.left_equal:
+				case scanner.left_comment:
+					scanner.stag = token;
+					if (content.length &gt; 0)
+					{
+						buff.push(put_cmd + '</span><span class="literal">"' + clean(content) + '"</span>)<span class="literal">');
+					}
+					content = '</span><span class="literal">';
+					break;
+				case scanner.double_left:
+					content = content + scanner.left_delimiter;
+					break;
+				default:
+					content = content + token;
+					break;
+			}
+		}
+		else {
+			switch(token) {
+				case scanner.right_delimiter:
+					switch(scanner.stag) {
+						case scanner.left_delimiter:
+							if (content[content.length - 1] == '</span>\n<span class="literal">')
+							{
+								content = chop(content);
+								buff.push(content);
+								buff.cr();
+							}
+							else {
+								buff.push(content);
+							}
+							break;
+						case scanner.left_equal:
+							buff.push(insert_cmd + "(EJS.Scanner.to_text(" + content + ")))");
+							break;
+					}
+					scanner.stag = null;
+					content = '</span><span class="literal">';
+					break;
+				case scanner.double_right:
+					content = content + scanner.right_delimiter;
+					break;
+				default:
+					content = content + token;
+					break;
+			}
+		}
+	});
+	if (content.length &gt; 0)
+	{
+		// Chould be content.dump in Ruby
+		buff.push(put_cmd + '</span><span class="literal">"' + clean(content) + '"</span>)<span class="literal">');
+	}
+	buff.close();
+	this.out = buff.script + ";";
+	var to_be_evaled = '</span><span class="comment">/*'+name+'*/</span><span class="reserved">this</span>.process = <span class="reserved">function</span>(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {<span class="literal">'+this.out+" return ___ViewO.join('</span><span class="literal">');}}}catch(e){e.lineNumber=null;throw e;}};";
+
+	try{
+		eval(to_be_evaled);
+	}catch(e){
+		if(typeof JSLINT != '</span>undefined<span class="literal">'){
+			JSLINT(this.out);
+			for(var i = 0; i &lt; JSLINT.errors.length; i++){
+				var error = JSLINT.errors[i];
+				if(error.reason != "Unnecessary semicolon."){
+					error.line++;
+					var e = new Error();
+					e.lineNumber = error.line;
+					e.message = error.reason;
+					if(options.view)
+						e.fileName = options.view;
+					throw e;
+				}
+			}
+		}else{
+			throw e;
+		}
+	}
+  }
+};
+
+
+//type, cache, folder
+/**
+ * Sets default options for all views
+ * @param {Object} options Set view with the following options
+ * &lt;table class="options"&gt;
+				&lt;tbody&gt;&lt;tr&gt;&lt;th&gt;Option&lt;/th&gt;&lt;th&gt;Default&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;/tr&gt;
+				&lt;tr&gt;
+					&lt;td&gt;type&lt;/td&gt;
+					&lt;td&gt;'</span>&lt;<span class="literal">'&lt;/td&gt;
+					&lt;td&gt;type of magic tags.  Options are '</span>&amp;lt;<span class="literal">' or '</span>[<span class="literal">'
+					&lt;/td&gt;
+				&lt;/tr&gt;
+				&lt;tr&gt;
+					&lt;td&gt;cache&lt;/td&gt;
+					&lt;td&gt;true in production mode, false in other modes&lt;/td&gt;
+					&lt;td&gt;true to cache template.
+					&lt;/td&gt;
+				&lt;/tr&gt;
+	&lt;/tbody&gt;&lt;/table&gt;
+ * 
+ */
+EJS.config = function(options){
+	EJS.cache = options.cache != null ? options.cache : EJS.cache;
+	EJS.type = options.type != null ? options.type : EJS.type;
+	EJS.ext = options.ext != null ? options.ext : EJS.ext;
+
+	var templates_directory = EJS.templates_directory || {}; //nice and private container
+	EJS.templates_directory = templates_directory;
+	EJS.get = function(path, cache){
+		if(cache == false) return null;
+		if(templates_directory[path]) return templates_directory[path];
+  		return null;
+	};
+
+	EJS.update = function(path, template) { 
+		if(path == null) return;
+		templates_directory[path] = template ;
+	};
+
+	EJS.INVALID_PATH =  -1;
+};
+EJS.config( {cache: true, type: '</span>&lt;<span class="literal">', ext: '</span>.ejs<span class="literal">' } );
+
+
+/**
+ * @constructor
+ * By adding functions to EJS.Helpers.prototype, those functions will be available in the 
+ * views.
+ * @init Creates a view helper.  This function is called internally.  You should never call it.
+ * @param {Object} data The data passed to the view.  Helpers have access to it through this._data
+ */
+EJS.Helpers = function(data, extras){
+	this._data = data;
+    this._extras = extras;
+    extend(this, extras );
+};
+/* @prototype*/
+EJS.Helpers.prototype = {
+    /**
+     * Renders a new view.  If data is passed in, uses that to render the view.
+     * @param {Object} options standard options passed to a new view.
+     * @param {optional:Object} data
+     * @return {String}
+     */
+	view: function(options, data, helpers){
+        if(!helpers) helpers = this._extras
+		if(!data) data = this._data;
+		return new EJS(options).render(data, helpers);
+	},
+    /**
+     * For a given value, tries to create a human representation.
+     * @param {Object} input the value being converted.
+     * @param {Object} null_text what text should be present if input == null or undefined, defaults to '</span><span class="literal">'
+     * @return {String} 
+     */
+	to_text: function(input, null_text) {
+	    if(input == null || input === undefined) return null_text || '</span><span class="literal">';
+	    if(input instanceof Date) return input.toDateString();
+		if(input.toString) return input.toString().replace(/\n/g, '</span>&lt;br /&gt;<span class="literal">').replace(/'</span><span class="literal">'/g, "'</span><span class="literal">");
+		return '';
+	}
+};
+    EJS.newRequest = function(){
+	   var factories = [function() { return new ActiveXObject("</span>Msxml2.XMLHTTP<span class="literal">"); },function() { return new XMLHttpRequest(); },function() { return new ActiveXObject("</span>Microsoft.XMLHTTP<span class="literal">"); }];
+	   for(var i = 0; i &lt; factories.length; i++) {
+	        try {
+	            var request = factories[i]();
+	            if (request != null)  return request;
+	        }
+	        catch(e) { continue;}
+	   }
+	}
+
+	EJS.request = function(path){
+	   var request = new EJS.newRequest()
+	   request.open("</span>GET<span class="literal">", path, false);
+
+	   try{request.send(null);}
+	   catch(e){return null;}
+
+	   if ( request.status == 404 || request.status == 2 ||(request.status == 0 &amp;&amp; request.responseText == '') ) return null;
+
+	   return request.responseText
+	}
+	EJS.ajax_request = function(params){
+		params.method = ( params.method ? params.method : 'GET')
+
+		var request = new EJS.newRequest();
+		request.onreadystatechange = function(){
+			if(request.readyState == 4){
+				if(request.status == 200){
+					params.onComplete(request)
+				}else
+				{
+					params.onComplete(request)
+				}
+			}
+		}
+		request.open(params.method, params.url)
+		request.send(null)
+	}
+
+})();
+// End of ejs 1.0 lib.
+
+// This class is created for documentation purposes.
+function MEJS() {};
+
+/**
  * Calls the EJS rendering library. Templates are given the MEJS (Mobius Embeded JavaScript)
  * extension to prevent overlap with Express' own EJS paraser.
  *
- * <span class="attrib">@param</span> {string} content content to render.
- * <span class="attrib">@param</span> {object} options options for renderer including variables for local scope of template.
- * <span class="attrib">@type</span> string
- * <span class="attrib">@return</span> content parsed by the EJS engine.
- * <span class="attrib">@public</span>
- */</span>
-MEJS.<span class="reserved">prototype</span>.render = <span class="reserved">function</span>(content, options) {
-	<span class="comment">// Render the template.</span>
+ * @param {string} content content to render.
+ * @param {object} options options for renderer including variables for local scope of template.
+ * @type string
+ * @return content parsed by the EJS engine.
+ * @public
+ */
+MEJS.prototype.render = function(content, options) {
+	// Render the template.
 	try {
- 		<span class="reserved">return</span> (new EJS({<span class="literal">'text'</span> : content})).render(options[<span class="literal">'locals'</span>]);
+ 		return (new EJS({'text' : content})).render(options['locals']);
 	} catch (e) {
-		<span class="reserved">return</span> <span class="literal">"An error occured while rendering the template: "</span> + e;
+		return "</span>An error occured <span class="reserved">while</span> rendering the template: " + e;
 	}
 };
 
@@ -188,7 +699,7 @@ exports.render = MEJS.<span class="reserved">prototype</span>.render;</pre>
 </table>
 </td>
 <td bgcolor="#EEEEFF" align="right" valign="top"><em>
-<b></b></em>
+<b>mobius-js</b></em>
 </td>
 </tr>
 
@@ -219,6 +730,6 @@ exports.render = MEJS.<span class="reserved">prototype</span>.render;</pre>
 <font size="-1">
 
 </font>
-<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sun May  9 00:47:14 2010</div>
+<div class="jsdoc_ctime">Documentation generated by <a href="http://jsdoc.sourceforge.net/" target="_parent">JSDoc</a> on Sat May 15 07:53:00 2010</div>
 </body>
 </html>
