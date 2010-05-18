@@ -14,20 +14,6 @@
 	},
 	
 	{
-		"route" : "/corey",
-		"method" : "get",
-		"controller" : "corey",
-		"action" : "index"
-	},
-	
-	{
-		"route" : "/corey",
-		"method" : "post",
-		"controller" : "corey",
-		"action" : "corey_update"
-	},
-	
-	{
 		"route" : "/catalogue",
 		"method" : "get",
 		"controller" : "catalogue",
