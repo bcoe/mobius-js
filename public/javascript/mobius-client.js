@@ -25,8 +25,9 @@
 // be kept to a minimum.
 
 // Mock out the 'exports' object used server-side.
-exports = {};
-resigConstructor = {}; // Mock out the constructor for a new resig class.
+var exports = {};
+var resigConstructor = {}; // Mock out the constructor for a new resig class.
+var processingStack = {}; // Client-side processing stack. 
 
 // Lookup table for model constructors once they are loaded.
 var modelConstructors = {};
@@ -69,9 +70,15 @@ $(document).ready(function() {
 		LazyLoad.loadOnce([
 			'/lib/model.js',
 		], function() {	
-			// Once we have the resig class and the model class 
-			// We can safely initialize the client-side mobius object.
-			initMobiusClient();
+			LazyLoad.loadOnce([
+				'/lib/client-processing-stack.js'
+			], function() {
+				processingStack = new exports.ProcessingStack();
+				
+				// Once we have the dependent classes loaded 
+				// We can safely initialize the client-side mobius object.
+				initMobiusClient();
+			});
 		});	
 	});
 
@@ -89,8 +96,14 @@ function initMobiusClient() {
  	 *
 	 */
 	var Client = Class.extend({
+		forms: {
+			'create' : {},
+			'update' : {},
+			'delete' : {},
+			'find' : {}
+		},// A  hash of forms handled by this client.
+		
 		init: function() {
-			console.log('Bootstrapping finished.');
 		},
 		
 		loadModel: function(modelFile) {
@@ -107,31 +120,43 @@ function initMobiusClient() {
 
 		},
 		
+		extractParameters: function($form, postFormat) {
+			// Copy the parameters from the form into an associative array.
+			var params = {};
+			$form.find(':input').each(function(k, v) {
+				var $input = $(this);
+				var extractParam = /^.*\[(.*)\].*$/; // Extract the field name.
+				var name = $input.attr('name');
+
+				if (name) { // Make sure the name attr is set.
+					name.match(extractParam);
+				 	name = RegExp.$1;
+					params[name] = $input.val();
+				}
+			});
+			
+			return params;		
+		},
+		
 		handleForm: function($form, params) {
-			var modelName = params['modelName'] || $form.attr('name');
-			var onSubmit = params['onSubmit'] || function () {};
+			var self = this;
+			var modelName = params.modelName || $form.attr('name');
+			var onSubmit = params.onSubmit || function () {};
+			this.forms[params.action || 'create'][modelName] = {
+				'form' : $form,
+				'route' : params.route || ''
+			};
 			
 			// Override default form submit actions.
 			$form.submit(function() {
 				var $this = $(this);
 
 				// Copy the parameters from the form into an associative array.
-				var params = {};
-				$this.find(':input').each(function(k, v) {
-					var $input = $(this);
-					var extractParam = /^.*\[(.*)\].*$/; // Extract the field name.
-					var name = $input.attr('name');
-
-					if (name) { // Make sure the name attr is set.
-						name.match(extractParam);
-					 	name = RegExp.$1;
-						params[name] = $input.val();
-					}
-				});		
+				var params = self.extractParameters($this);
 
 				// Validate the form parameters.
 				if (modelConstructors[modelName]) {
-					var model = new modelConstructors[modelName](null, modelConstructors[modelName]);
+					var model = new modelConstructors[modelName](processingStack, modelConstructors[modelName]);
 					var errors = model.validate(params);
 				}
 
@@ -141,6 +166,21 @@ function initMobiusClient() {
 				}
 				return onSubmit(null, params, modelName);
 			});
+		},
+		
+		create: function(modelName, callback) {
+			// We create an instance of the appropriate model.
+			var callback = callback || function() {};
+			var model;
+			var params = this.extractParameters(this.forms.create[modelName].form, true);
+			
+			if (modelConstructors[modelName]) {
+				model = new modelConstructors[modelName](processingStack, modelConstructors[modelName]);
+			} else {
+				return;
+			}
+			
+			model.create(params, this.forms.create[modelName].route, callback);
 		}
 	});
 

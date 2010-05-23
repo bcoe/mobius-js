@@ -26,10 +26,15 @@
 						
 						return false;
 					} else {
-						console.log(params);
-						return true;
+						client.create(modelName, function() {
+							alert('created the model!')
+						});
+						return false;
 					}
-				}
+				},
+				modelName: 'BlogPost',
+				route: '/blog/create',
+				action: 'create'
 			});
 		});
 		

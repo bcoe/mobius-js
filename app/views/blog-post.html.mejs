@@ -5,4 +5,4 @@ Date: <i><%= post ? post.date : '' %></i>
 </p>
 <%= partial('awesome.html.mejs') %>
 <hr />
-	<%=form( MobiusModel.BlogPost )%>
+	<%=form( MobiusModel.BlogPost, {'object' : post, 'action' : 'update'} )%>

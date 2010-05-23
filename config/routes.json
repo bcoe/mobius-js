@@ -14,6 +14,13 @@
 	},
 	
 	{
+		"route" : "/blog/create",
+		"method" : "post",
+		"controller" : "blog-post",
+		"action" : "create"
+	},
+	
+	{
 		"route" : "/catalogue",
 		"method" : "get",
 		"controller" : "catalogue",
@@ -60,5 +67,12 @@
 		"method" : "get",
 		"type" : "static",
 		"path" : "lib/resig/resig.js"
+	},
+	
+	{
+		"route" : "/lib/client-processing-stack.js",
+		"method" : "get",
+		"type" : "static",
+		"path" : "lib/mobius-js/client-processing-stack.js"
 	}
 ]
