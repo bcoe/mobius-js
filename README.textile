@@ -27,6 +27,8 @@ bq. node scripts/generate.js controller example
 
 Creates an example controller and view.
 
+
+
 bq. node scripts/server.js
 
 Run an instance of the server.
